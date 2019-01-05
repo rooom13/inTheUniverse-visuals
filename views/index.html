@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+
+  <title>Hola</title>
+
+
+  <style>
+    html,
+    body {
+      overflow: hidden;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+
+    }
+    .player {
+      position: absolute;
+      bottom: 1rem;
+      
+    }
+
+
+
+    
+  </style>
+</head>
+
+<body>
+
+
+  <!-- <audio class="player" controls> -->
+  <source src="music/hello.mp3" type="audio/mpeg">
+  <!-- Your browser does not support the audio element. -->
+  <!-- </audio> -->
+
+  <canvas id="myCanvas"></canvas>
+
+  <script>
+
+
+    const tEndIntro = 22700
+
+
+    const onKeyDown = (e) => {
+      // console.log(e)
+      switch (e.code) {
+        case 'Space':
+          console.log('Space')
+          nextWord()
+          break;
+        case 'KeyP':
+          console.log(timeNow - startTime)
+
+          start()
+          break;
+        case 'KeyQ':
+          console.log('Q')
+          sizeFrontMax++
+          break;
+        case 'KeyA':
+          console.log('A')
+          sizeFrontMax--
+          break;
+        case 'KeyW':
+          console.log('W')
+          sizeBackMax++
+          break;
+        case 'KeyS':
+          console.log('S')
+          sizeBackMax--
+          break;
+        case 'ArrowLeft':
+          console.log('left')
+          break;
+        case 'ArrowRight':
+          console.log('right')
+          break;
+        case 'ArrowUp':
+          speed += 0.05
+          console.log('speed', speed)
+          break;
+        case 'ArrowDown':
+          speed -= 0.05
+          console.log('speed', speed)
+          break;
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+
+
+
+
+    var N, speed0, speed1, speed, startTime, timePrev, timeNow, dt, canvas, ctx
+
+
+
+    var starsFront = [];
+    var starsBack = [];
+    var starsFarBack = [];
+
+    let toWrite = ''
+
+
+    function start() {
+      if (music.paused)
+        music.play(); else music.pause()
+
+      startTime = performance.now()
+
+      speed = speed0
+
+
+
+    }
+
+    function init() {
+      console.log('init')
+      N = 200
+      speed0 = 2.8
+      speed1 = 0.01
+      speed = speed1
+      timePrev = 0
+
+      music = new Audio('music/hello.mp3');
+
+
+      initCanvas()
+
+
+      initStars()
+
+      window.requestAnimationFrame(() => { update(); render() })
+    }
+
+
+
+    // INITATORS
+
+    function initCanvas() {
+      canvas = document.querySelector("canvas");
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+      canvas.addEventListener('click',start)
+      ctx = canvas.getContext("2d");
+    }
+
+    function initStars() {
+      for (var i = 0; i < N; ++i) {
+
+        starsFront.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: 0.5 + Math.random() * 1,
+        });
+      }
+      for (var i = 0; i < N; ++i) {
+        starsBack.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: 3 + Math.random() * 1
+        });
+      }
+      for (var i = 0; i < 12000; ++i) {
+        starsFarBack.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: 80 + Math.random() * 1
+        });
+      }
+
+    }
+
+
+    // UPDATORS
+    function updateStarsFront(dt) {
+      for (star in starsFront) {
+        var star = starsFront[star];
+        const starSpeed = speed / star.z
+
+        star.y += starSpeed * dt
+        if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+        if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+
+      }
+    }
+
+    function updateStarsBack(dt) {
+      for (star in starsBack) {
+        var star = starsBack[star];
+        const starSpeed = speed / star.z
+
+        star.y += starSpeed * dt
+        if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+        if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+      }
+    }
+
+
+    function updateStarsFarBack(dt) {
+      for (star in starsFarBack) {
+        var star = starsFarBack[star];
+        const starSpeed = speed / star.z
+
+        star.y += starSpeed * dt
+        if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+        if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+      }
+    }
+
+    var sizeFrontMax = 18
+    var sizeBackMax = 84
+
+    const lyrics = [
+      'Fly',
+      'In the universe I want to',
+      'Fly',
+      'There is no war',
+      'There is no crime',
+      'Please come with me',
+      'and take my hand',
+      'Sal ahora mismo y déjalo',
+      'Vente al universo conmigo',
+      'Escápate y olvídalo',
+      'Vente al universo conmigo',
+      'Prepárate y vámonos',
+      'Vente al universo conmigo',
+      'Quiero volar'
+
+
+
+    ]
+
+    let currentVerseIndex = 0
+    let currentWordIndex = 0
+    let currentVerseList = lyrics[0].split(' ')
+    let currentWord = currentVerseList[0]
+    let currentTextBuffer = ''
+
+    function nextWord() {
+      console.log(currentWordIndex, currentVerseList.length - 1)
+      if (currentWordIndex > currentVerseList.length - 1) {
+        console.log('currentVerseIndex', currentVerseIndex)
+        currentWordIndex = 0
+        currentVerseIndex++
+        currentVerseList = lyrics[currentVerseIndex].split(' ')
+        currentTextBuffer = ''
+        console.log('currentVerseIndex', currentVerseIndex)
+
+
+      }
+      currentWord = currentVerseList[currentWordIndex]
+      currentTextBuffer += ` ${currentWord} `
+      currentWordIndex++
+
+
+    }
+
+    // DRAWERS
+    function drawStarsFront(stars) {
+      ctx.fillStyle = "white";
+      for (star in stars) {
+        var star = stars[star];
+        ctx.fillRect(star.x, star.y, sizeFrontMax / star.z, sizeFrontMax / star.z);
+      }
+
+    }
+
+    function drawLyrics() {
+      ctx.fillStyle = "red";
+
+      ctx.font = "70px Display";
+      ctx.textAlign = "center"
+      ctx.fillText(currentTextBuffer, canvas.width / 2, canvas.height / 2);
+
+    }
+
+    function drawStarsBack(stars) {
+      ctx.fillStyle = "grey"
+      for (star in stars) {
+        var star = stars[star];
+        ctx.fillRect(star.x, star.y, sizeBackMax / star.z, sizeBackMax / star.z);
+
+      }
+    }
+
+    function drawStarsFarBack(stars) {
+      ctx.fillStyle = "white"
+      for (star in stars) {
+        var star = stars[star];
+        ctx.fillRect(star.x, star.y, 0.2 , 0.2);
+
+      }
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    //UPDATE
+    function update() {
+
+      timeNow = performance.now()
+      var dt = timeNow - timePrev
+      timePrev = timeNow
+
+      // intro deacceleration
+      if (timeNow - startTime < tEndIntro) {
+        speed -= 0.0001229 * dt
+      }
+
+
+
+
+      updateStarsBack(dt)
+      updateStarsFront(dt)
+      // updateStarsFarBack(dt)
+
+    }
+    //RENDER
+    function render() {
+
+      drawBackground()
+      // drawStarsFarBack(starsFarBack)
+      drawStarsBack(starsBack)
+
+
+      drawLyrics()
+
+
+      drawStarsFront(starsFront)
+
+      window.requestAnimationFrame(() => { update(); render() });
+    }
+
+
+
+
+
+
+    function mainLoop() {
+
+      update()
+      render()
+
+    }
+
+
+
+    init()
+
+
+  </script>
+
+
+</body>
+
+</html>
