@@ -17,25 +17,41 @@
       height: 100%;
 
     }
+
     .player {
       position: absolute;
       bottom: 1rem;
-      
+      width: 100%;
+
     }
 
+    .timeControl {
+      position: absolute;
+      bottom: 0;
+      padding: 1rem;
 
 
-    
+    }
+
+    .timeControl>input {
+      width: 50px;
+    }
   </style>
 </head>
 
 <body>
 
 
-  <!-- <audio class="player" controls> -->
-  <source src="music/hello.mp3" type="audio/mpeg">
-  <!-- Your browser does not support the audio element. -->
-  <!-- </audio> -->
+  <!-- <audio class="player" controls>
+    <source src="music/hello.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio> -->
+
+  <div class="timeControl">
+    <input id="travelTo" placeholder="1000" />
+    <button onclick="travelTo( travelTo.value || 1000)">Go</button>
+
+  </div>
 
   <canvas id="myCanvas"></canvas>
 
@@ -43,35 +59,32 @@
 
 
     const tEndIntro = 22700
+    const tStartChangeColor = 46600
+    const tEndChangeColor = 54500
+
 
 
     const onKeyDown = (e) => {
       // console.log(e)
       switch (e.code) {
+        case 'Digit1':
+          travelTo(tEndIntro)
+          break;
         case 'Space':
           console.log('Space')
           nextWord()
           break;
         case 'KeyP':
           console.log(timeNow - startTime)
-
-          start()
           break;
         case 'KeyQ':
           console.log('Q')
           sizeFrontMax++
           break;
-        case 'KeyA':
-          console.log('A')
-          sizeFrontMax--
-          break;
-        case 'KeyW':
-          console.log('W')
-          sizeBackMax++
-          break;
         case 'KeyS':
           console.log('S')
-          sizeBackMax--
+          start()
+
           break;
         case 'ArrowLeft':
           console.log('left')
@@ -94,8 +107,10 @@
 
 
 
-
-    var N, speed0, speed1, speed, startTime, timePrev, timeNow, dt, canvas, ctx
+    const DEBUG = true
+    var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong, dt, canvas, ctx
+    var songStarted = false
+    var colors
 
 
 
@@ -106,13 +121,50 @@
     let toWrite = ''
 
 
+
+    class Color {
+      constructor(r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+
+      }
+
+
+      increment(i) {
+        this.r += i
+        this.g += i
+        this.b += i
+
+      }
+
+
+
+      get rgb() {
+        return `rgb(${this.r}, ${this.g}, ${this.b})`
+      }
+    }
+
+
+
     function start() {
-      if (music.paused)
-        music.play(); else music.pause()
+      if (music.paused) {
+        if (music.currentTime == 0) {
+          music.currentTime += 0.096
 
-      startTime = performance.now()
+          speed = speed0
+        }          
+          startTime = performance.now() - (timeSong || 0)
 
-      speed = speed0
+        music.play().then(songStarted = true);
+      }
+      else {
+        music.pause()
+        songStarted = false
+      }
+
+
+
 
 
 
@@ -125,6 +177,13 @@
       speed1 = 0.01
       speed = speed1
       timePrev = 0
+
+      colors = {
+        background: new Color(0, 0, 0),
+        starsFront: new Color(255, 255, 255)
+
+      }
+
 
       music = new Audio('music/hello.mp3');
 
@@ -145,7 +204,7 @@
       canvas = document.querySelector("canvas");
       canvas.width = document.body.clientWidth;
       canvas.height = document.body.clientHeight;
-      canvas.addEventListener('click',start)
+      canvas.addEventListener('click', start)
       ctx = canvas.getContext("2d");
     }
 
@@ -217,12 +276,15 @@
 
     const lyrics = [
       'Fly',
-      'In the universe I want to',
+      'In the universe',
+      'I want to',
       'Fly',
       'There is no war',
-      'There is no crime',
+      'There is no',
+      'crime',
       'Please come with me',
-      'and take my hand',
+      'and take my',
+      'hand',
       'Sal ahora mismo y déjalo',
       'Vente al universo conmigo',
       'Escápate y olvídalo',
@@ -241,28 +303,80 @@
     let currentWord = currentVerseList[0]
     let currentTextBuffer = ''
 
+
+    function travelTo(toTime_ms) {
+      const toTime = toTime_ms / 1000
+      music.currentTime = toTime
+      startTime = timeNow - toTime_ms
+
+
+
+
+
+    }
     function nextWord() {
-      console.log(currentWordIndex, currentVerseList.length - 1)
       if (currentWordIndex > currentVerseList.length - 1) {
-        console.log('currentVerseIndex', currentVerseIndex)
         currentWordIndex = 0
         currentVerseIndex++
         currentVerseList = lyrics[currentVerseIndex].split(' ')
         currentTextBuffer = ''
-        console.log('currentVerseIndex', currentVerseIndex)
 
 
       }
       currentWord = currentVerseList[currentWordIndex]
-      currentTextBuffer += ` ${currentWord} `
+      currentTextBuffer += currentWord + (currentWordIndex == currentVerseList.length - 1 ? '' : ' ')
       currentWordIndex++
 
 
     }
 
     // DRAWERS
+    function drawDebug() {
+
+
+
+      const what =
+        `music.currentTime : 
+timeSong :
+startTime:
+timeNow:`
+      const value =
+        `${music.currentTime.toFixed(2)}
+${(timeSong / 1000 || 0).toFixed(2)}
+${(startTime || 0).toFixed(0)}
+${timeNow.toFixed(0)}
+${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
+`
+      const lines = what.split('\n');
+      const lines2 = value.split('\n');
+
+      const Nlines = lines.length
+      const lineHeight = 16
+      const lenghtWhat = 120
+      const lenghtValue = 60
+
+      ctx.fillStyle = "black";
+
+      ctx.fillRect(0, 0, lenghtWhat, Nlines * lineHeight)
+
+      ctx.fillRect(lenghtWhat, 0, lenghtValue, Nlines * lineHeight)
+      ctx.fillStyle = "cyan";
+
+      ctx.font = "10px courier";
+      ctx.textAlign = "start"
+
+
+
+      for (var i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], 5, 10 + (i * lineHeight));
+
+        ctx.fillText(lines2[i], lenghtWhat, 10 + (i * lineHeight));
+      }
+
+    }
+
     function drawStarsFront(stars) {
-      ctx.fillStyle = "white";
+      ctx.fillStyle = colors.starsFront.rgb;
       for (star in stars) {
         var star = stars[star];
         ctx.fillRect(star.x, star.y, sizeFrontMax / star.z, sizeFrontMax / star.z);
@@ -273,9 +387,12 @@
     function drawLyrics() {
       ctx.fillStyle = "red";
 
-      ctx.font = "70px Display";
-      ctx.textAlign = "center"
-      ctx.fillText(currentTextBuffer, canvas.width / 2, canvas.height / 2);
+      ctx.font = "70px arial";
+      ctx.textAlign = "start"
+
+      let textSize = ctx.measureText(lyrics[currentVerseIndex]).width
+
+      ctx.fillText(currentTextBuffer, canvas.width / 2 - textSize / 2, canvas.height / 2);
 
     }
 
@@ -292,13 +409,13 @@
       ctx.fillStyle = "white"
       for (star in stars) {
         var star = stars[star];
-        ctx.fillRect(star.x, star.y, 0.2 , 0.2);
+        ctx.fillRect(star.x, star.y, 0.2, 0.2);
 
       }
     }
 
     function drawBackground() {
-      ctx.fillStyle = "black";
+      ctx.fillStyle = colors.background.rgb;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -309,10 +426,36 @@
       var dt = timeNow - timePrev
       timePrev = timeNow
 
-      // intro deacceleration
-      if (timeNow - startTime < tEndIntro) {
-        speed -= 0.0001229 * dt
+
+      if (songStarted) {
+
+        timeSong = timeNow - startTime
+
+
+
+
+
+
+
+        // intro deacceleration
+        // if (timeSong < tEndIntro) {
+          speed = speed0 - 0.0001229 * (timeSong > tEndIntro ? tEndIntro: timeSong)
+          
+        // }
+
+
+        // change colors 1
+        if (timeSong > tStartChangeColor && timeSong < tEndChangeColor) {
+          console.log('sex')
+          const backgroundColorIncrement = (255 / (tEndChangeColor - tStartChangeColor)) * dt
+          const starsFrontColorIncrement = (-255 / (tEndChangeColor - tStartChangeColor)) * dt
+          colors.background.increment(backgroundColorIncrement)
+          colors.starsFront.increment(starsFrontColorIncrement)
+
+        }
       }
+
+
 
 
 
@@ -322,18 +465,27 @@
       // updateStarsFarBack(dt)
 
     }
+
+    let farBackStars = false
     //RENDER
     function render() {
 
       drawBackground()
-      // drawStarsFarBack(starsFarBack)
+      if (farBackStars) drawStarsFarBack(starsFarBack)
       drawStarsBack(starsBack)
 
 
       drawLyrics()
 
 
+
       drawStarsFront(starsFront)
+
+
+
+      if (DEBUG) {
+        drawDebug()
+      }
 
       window.requestAnimationFrame(() => { update(); render() });
     }
