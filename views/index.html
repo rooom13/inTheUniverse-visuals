@@ -70,11 +70,17 @@
         case 'Digit1':
           travelTo(tEndIntro)
           break;
+        case 'Digit2':
+          travelTo(tStartChangeColor)
+          break;
         case 'Space':
           console.log('Space')
           nextWord()
           break;
-        case 'KeyP':
+        case 'KeyB':
+          farBackStars = !farBackStars
+          break;
+        case 'KeyT':
           console.log(timeNow - startTime)
           break;
         case 'KeyQ':
@@ -86,6 +92,9 @@
           start()
 
           break;
+        case 'KeyD':
+          DEBUG = !DEBUG
+          break
         case 'ArrowLeft':
           console.log('left')
           break;
@@ -107,10 +116,10 @@
 
 
 
-    const DEBUG = true
+    var DEBUG = true
     var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong, dt, canvas, ctx
     var songStarted = false
-    var colors
+    let farBackStars = true
 
 
 
@@ -118,17 +127,34 @@
     var starsBack = [];
     var starsFarBack = [];
 
-    let toWrite = ''
+   
 
 
 
     class Color {
       constructor(r, g, b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
+        this.r = r
+        this.g = g
+        this.b = b
 
       }
+
+      plus(col) {
+        return new Color(this.r + col.r, this.g + col.g, this.b + col.b)
+      }
+
+      minus(col) {
+        return new Color(this.r - col.r, this.g - col.g, this.b - col.b)
+      }
+
+      divided(value) {
+        return new Color(this.r / value, this.g / value, this.b / value)
+      }
+
+      multiplied(value) {
+        return new Color(this.r * value, this.g * value, this.b * value)
+      }
+
 
 
       increment(i) {
@@ -153,8 +179,8 @@
           music.currentTime += 0.096
 
           speed = speed0
-        }          
-          startTime = performance.now() - (timeSong || 0)
+        }
+        startTime = performance.now() - (timeSong || 0)
 
         music.play().then(songStarted = true);
       }
@@ -173,16 +199,9 @@
     function init() {
       console.log('init')
       N = 200
-      speed0 = 2.8
-      speed1 = 0.01
-      speed = speed1
       timePrev = 0
 
-      colors = {
-        background: new Color(0, 0, 0),
-        starsFront: new Color(255, 255, 255)
 
-      }
 
 
       music = new Audio('music/hello.mp3');
@@ -239,7 +258,7 @@
     function updateStarsFront(dt) {
       for (star in starsFront) {
         var star = starsFront[star];
-        const starSpeed = speed / star.z
+        const starSpeed = speeds.stars.speed / star.z
 
         star.y += starSpeed * dt
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
@@ -251,7 +270,7 @@
     function updateStarsBack(dt) {
       for (star in starsBack) {
         var star = starsBack[star];
-        const starSpeed = speed / star.z
+        const starSpeed = speeds.stars.speed / star.z
 
         star.y += starSpeed * dt
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
@@ -263,7 +282,7 @@
     function updateStarsFarBack(dt) {
       for (star in starsFarBack) {
         var star = starsFarBack[star];
-        const starSpeed = speed / star.z
+        const starSpeed = speeds.stars.speed / star.z
 
         star.y += starSpeed * dt
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
@@ -292,17 +311,36 @@
       'Prepárate y vámonos',
       'Vente al universo conmigo',
       'Quiero volar'
-
-
-
     ]
+
+    var speeds = {
+      stars: {
+        speed: 0.01,
+        from: 2.8,
+        to: 0.01
+      }
+    }
+
+    var colors = {
+      background: {
+        color: new Color(0, 0, 0),
+        from: new Color(0, 0, 0),
+        to: new Color(255, 255, 255),
+      },
+      starsFront: {
+        color: new Color(255, 255, 255),
+        from: new Color(255, 255, 255),
+        to: new Color(0, 0, 0),
+
+      }
+    }
 
     let currentVerseIndex = 0
     let currentWordIndex = 0
     let currentVerseList = lyrics[0].split(' ')
     let currentWord = currentVerseList[0]
     let currentTextBuffer = ''
-
+    let toWrite = ''
 
     function travelTo(toTime_ms) {
       const toTime = toTime_ms / 1000
@@ -345,7 +383,7 @@ timeNow:`
 ${(timeSong / 1000 || 0).toFixed(2)}
 ${(startTime || 0).toFixed(0)}
 ${timeNow.toFixed(0)}
-${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
+${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
 `
       const lines = what.split('\n');
       const lines2 = value.split('\n');
@@ -375,14 +413,7 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
 
     }
 
-    function drawStarsFront(stars) {
-      ctx.fillStyle = colors.starsFront.rgb;
-      for (star in stars) {
-        var star = stars[star];
-        ctx.fillRect(star.x, star.y, sizeFrontMax / star.z, sizeFrontMax / star.z);
-      }
 
-    }
 
     function drawLyrics() {
       ctx.fillStyle = "red";
@@ -396,6 +427,15 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
 
     }
 
+    function drawStarsFront(stars) {
+      ctx.fillStyle = colors.starsFront.color.rgb;
+      for (star in stars) {
+        var star = stars[star];
+        ctx.fillRect(star.x, star.y, sizeFrontMax / star.z, sizeFrontMax / star.z);
+      }
+
+    }
+
     function drawStarsBack(stars) {
       ctx.fillStyle = "grey"
       for (star in stars) {
@@ -406,7 +446,7 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
     }
 
     function drawStarsFarBack(stars) {
-      ctx.fillStyle = "white"
+      ctx.fillStyle = colors.starsFront.color.rgb
       for (star in stars) {
         var star = stars[star];
         ctx.fillRect(star.x, star.y, 0.2, 0.2);
@@ -415,8 +455,21 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
     }
 
     function drawBackground() {
-      ctx.fillStyle = colors.background.rgb;
+      ctx.fillStyle = colors.background.color.rgb;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+
+    function updateSpeedTransition(speeds, start, end) {
+      const acceleration = (speeds.to - speeds.from) / (end - start)
+      speeds.speed = speeds.from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+
+    }
+
+    function updateColorTransition(colors, start, end) {
+      const colorSpeed = colors.to.minus(colors.from).divided(end - start)
+      colors.color = colors.from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+
     }
 
     //UPDATE
@@ -431,28 +484,12 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
 
         timeSong = timeNow - startTime
 
+        // 1 transition, reduce speed
+        updateSpeedTransition(speeds.stars, 0, tEndIntro)
 
-
-
-
-
-
-        // intro deacceleration
-        // if (timeSong < tEndIntro) {
-          speed = speed0 - 0.0001229 * (timeSong > tEndIntro ? tEndIntro: timeSong)
-          
-        // }
-
-
-        // change colors 1
-        if (timeSong > tStartChangeColor && timeSong < tEndChangeColor) {
-          console.log('sex')
-          const backgroundColorIncrement = (255 / (tEndChangeColor - tStartChangeColor)) * dt
-          const starsFrontColorIncrement = (-255 / (tEndChangeColor - tStartChangeColor)) * dt
-          colors.background.increment(backgroundColorIncrement)
-          colors.starsFront.increment(starsFrontColorIncrement)
-
-        }
+        // 2 transition, colors  inverted
+        updateColorTransition(colors.background, tStartChangeColor, tEndChangeColor)
+        updateColorTransition(colors.starsFront, tStartChangeColor, tEndChangeColor)
       }
 
 
@@ -466,7 +503,6 @@ ${(timeSong/1000 || 0 - music.currentTime).toFixed(4)}
 
     }
 
-    let farBackStars = false
     //RENDER
     function render() {
 
