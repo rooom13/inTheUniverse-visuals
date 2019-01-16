@@ -92,23 +92,13 @@
           start()
 
           break;
+        case 'KeyC':
+          showCircles = !showCircles
+          break
+
         case 'KeyD':
           DEBUG = !DEBUG
           break
-        case 'ArrowLeft':
-          console.log('left')
-          break;
-        case 'ArrowRight':
-          console.log('right')
-          break;
-        case 'ArrowUp':
-          speed += 0.05
-          console.log('speed', speed)
-          break;
-        case 'ArrowDown':
-          speed -= 0.05
-          console.log('speed', speed)
-          break;
       }
     }
 
@@ -120,6 +110,7 @@
     var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong, dt, canvas, ctx
     var songStarted = false
     let farBackStars = true
+    let showCircles = false
 
 
 
@@ -127,7 +118,7 @@
     var starsBack = [];
     var starsFarBack = [];
 
-   
+
 
 
 
@@ -198,7 +189,7 @@
 
     function init() {
       console.log('init')
-      N = 200
+      N = 100
       timePrev = 0
 
 
@@ -258,9 +249,16 @@
     function updateStarsFront(dt) {
       for (star in starsFront) {
         var star = starsFront[star];
-        const starSpeed = speeds.stars.speed / star.z
 
-        star.y += starSpeed * dt
+        const constantHorizontalSpeed = speeds.horizontal.speed / star.z
+        const constantVerticalSpeed = speeds.vertical.speed / star.z
+
+        oscillatorySpeedX = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+        oscillatorySpeedY = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+
+        star.x += constantHorizontalSpeed * dt + oscillatorySpeedX
+        star.y += constantVerticalSpeed * dt + oscillatorySpeedY
+
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
         if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
 
@@ -270,9 +268,17 @@
     function updateStarsBack(dt) {
       for (star in starsBack) {
         var star = starsBack[star];
-        const starSpeed = speeds.stars.speed / star.z
 
-        star.y += starSpeed * dt
+        const constantHorizontalSpeed = speeds.horizontal.speed / star.z
+        const constantVerticalSpeed = speeds.vertical.speed / star.z
+
+        oscillatorySpeedX = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+        oscillatorySpeedY = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+
+        star.x += constantHorizontalSpeed * dt + oscillatorySpeedX
+        star.y += constantVerticalSpeed * dt + oscillatorySpeedY
+
+
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
         if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
       }
@@ -282,7 +288,7 @@
     function updateStarsFarBack(dt) {
       for (star in starsFarBack) {
         var star = starsFarBack[star];
-        const starSpeed = speeds.stars.speed / star.z
+        const starSpeed = speeds.vertical.speed / star.z
 
         star.y += starSpeed * dt
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
@@ -300,10 +306,10 @@
       'Fly',
       'There is no war',
       'There is no',
-      'crime',
+      'Crime',
       'Please come with me',
-      'and take my',
-      'hand',
+      'And take my',
+      'Hand',
       'Sal ahora mismo y déjalo',
       'Vente al universo conmigo',
       'Escápate y olvídalo',
@@ -313,13 +319,32 @@
       'Quiero volar'
     ]
 
+
+    var keyPressedMap = {}; // You could also use an array
+    onkeydown = onkeyup = function (e) {
+      e = e || event; // to deal with IE
+      keyPressedMap[e.keyCode] = e.type == 'keydown';
+      /* insert conditional here */
+    }
+
     var speeds = {
-      stars: {
+      vertical: {
         speed: 0.01,
         from: 2.8,
         to: 0.01
+      },
+      horizontal: {
+        speed: 0.01 * 0
+      },
+      radius: {
+        speed: 0.1 * 0
+      },
+      angular: {
+        speed: 0.5 * 0
       }
     }
+    var oscillatorySpeedX = 0
+    var oscillatorySpeedY = 0
 
     var colors = {
       background: {
@@ -331,6 +356,12 @@
         color: new Color(255, 255, 255),
         from: new Color(255, 255, 255),
         to: new Color(0, 0, 0),
+
+      },
+      starsBack: {
+        color: new Color(220, 220, 220),
+        from: new Color(220, 220, 220),
+        to: new Color(35, 35, 35),
 
       }
     }
@@ -371,20 +402,39 @@
     // DRAWERS
     function drawDebug() {
 
-
-
       const what =
-        `music.currentTime : 
+        `map:
+music.currentTime : 
 timeSong :
 startTime:
-timeNow:`
+timeNow:
+horizontalSpeed:
+verticalSpeed:
+radiusSpeed:
+angularSpeed:
+oscillatorySpeedX:
+oscillatorySpeedY
+`
       const value =
-        `${music.currentTime.toFixed(2)}
+        `${JSON.stringify(keyPressedMap)}
+${music.currentTime.toFixed(2)}
 ${(timeSong / 1000 || 0).toFixed(2)}
 ${(startTime || 0).toFixed(0)}
 ${timeNow.toFixed(0)}
-${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
+${speeds.horizontal.speed.toFixed(2)}
+${speeds.vertical.speed.toFixed(2)}
+${speeds.radius.speed.toFixed(2)}
+${speeds.angular.speed.toFixed(2)}
+${oscillatorySpeedX.toFixed(2)}
+${oscillatorySpeedY.toFixed(2)}
+
+
+
 `
+
+
+
+
       const lines = what.split('\n');
       const lines2 = value.split('\n');
 
@@ -431,16 +481,33 @@ ${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
       ctx.fillStyle = colors.starsFront.color.rgb;
       for (star in stars) {
         var star = stars[star];
-        ctx.fillRect(star.x, star.y, sizeFrontMax / star.z, sizeFrontMax / star.z);
+        const size = sizeFrontMax / star.z
+
+        if (showCircles)
+
+          drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
+        else ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
+
       }
 
     }
 
+    function drawCircle(x, y, radius, color) {
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
     function drawStarsBack(stars) {
-      ctx.fillStyle = "grey"
+      ctx.fillStyle = colors.starsBack.color.rgb
       for (star in stars) {
         var star = stars[star];
-        ctx.fillRect(star.x, star.y, sizeBackMax / star.z, sizeBackMax / star.z);
+        const size = sizeBackMax / star.z
+        if (showCircles)
+          drawCircle(star.x, star.y, sizeBackMax / star.z / 2, colors.starsBack.color.rgb)
+        else ctx.fillRect(star.x - size/2, star.y - size/2, size, size);
+
 
       }
     }
@@ -472,6 +539,40 @@ ${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
 
     }
 
+    function updateSpeedsKeyPressed() {
+
+      const ctrlPressed = keyPressedMap[17] || false
+
+      const leftPressed = keyPressedMap[37] || false
+      const upPressed = keyPressedMap[38] || false
+      const rightPressed = keyPressedMap[39] || false
+      const downPressed = keyPressedMap[40] || false
+
+      const boost = 0.005
+
+      if (!ctrlPressed) {
+
+        speeds.vertical.speed += boost * (downPressed - upPressed)
+        speeds.horizontal.speed += boost * (rightPressed - leftPressed)
+
+      } else {
+        const radiusBoost = 0.05
+        const angularSpeedBoost = 0.05
+
+        speeds.radius.speed += radiusBoost * (downPressed - upPressed)
+        speeds.angular.speed += angularSpeedBoost * (rightPressed - leftPressed)
+
+
+
+      }
+
+
+
+
+
+
+    }
+
     //UPDATE
     function update() {
 
@@ -479,17 +580,21 @@ ${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
       var dt = timeNow - timePrev
       timePrev = timeNow
 
+      updateSpeedsKeyPressed()
+
+
 
       if (songStarted) {
-
         timeSong = timeNow - startTime
 
         // 1 transition, reduce speed
-        updateSpeedTransition(speeds.stars, 0, tEndIntro)
+        updateSpeedTransition(speeds.vertical, 0, tEndIntro)
 
         // 2 transition, colors  inverted
         updateColorTransition(colors.background, tStartChangeColor, tEndChangeColor)
         updateColorTransition(colors.starsFront, tStartChangeColor, tEndChangeColor)
+        updateColorTransition(colors.starsBack, tStartChangeColor, tEndChangeColor)
+
       }
 
 
@@ -499,7 +604,6 @@ ${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
 
       updateStarsBack(dt)
       updateStarsFront(dt)
-      // updateStarsFarBack(dt)
 
     }
 
@@ -516,6 +620,10 @@ ${(timeSong / 1000 || 0 - music.currentTime).toFixed(4)}
 
 
       drawStarsFront(starsFront)
+
+
+
+
 
 
 
