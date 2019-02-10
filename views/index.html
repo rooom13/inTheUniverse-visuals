@@ -47,6 +47,8 @@
     Your browser does not support the audio element.
   </audio> -->
 
+  <img id="asteroid" src="sprites/asteroid.png" style="display:none" />
+
   <div class="timeControl">
     <input id="travelTo" placeholder="1000" />
     <button onclick="travelTo( travelTo.value || 1000)">Go</button>
@@ -93,7 +95,8 @@
 
           break;
         case 'KeyC':
-          showCircles = !showCircles
+          starsShape = (starsShape + 1) % 3
+          console.log(starsShape)
           break
 
         case 'KeyD':
@@ -109,8 +112,20 @@
     var DEBUG = true
     var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong, dt, canvas, ctx
     var songStarted = false
-    let farBackStars = true
-    let showCircles = false
+    let farBackStars = false
+
+    const READY = 2
+    const PENDING = 1
+    const FINISHED = 0
+
+    let lyricsFadeOut = FINISHED
+
+    const SHOWSQUARES = 0
+    const SHOWCIRCLES = 1
+    const SHOWIMAGE = 2
+
+
+    let starsShape = 0
 
 
 
@@ -189,13 +204,14 @@
 
     function init() {
       console.log('init')
-      N = 100
+      N = 50
       timePrev = 0
 
 
 
 
       music = new Audio('music/hello.mp3');
+      img = document.getElementById("asteroid")
 
 
       initCanvas()
@@ -224,17 +240,17 @@
         starsFront.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          z: 0.5 + Math.random() * 1,
+          z: 0.5 + Math.random() * 2,
         });
       }
       for (var i = 0; i < N; ++i) {
         starsBack.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          z: 3 + Math.random() * 1
+          z: 4 + Math.random() * 1
         });
       }
-      for (var i = 0; i < 12000; ++i) {
+      for (var i = 0; i < 8000; ++i) {
         starsFarBack.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
@@ -299,6 +315,7 @@
     var sizeFrontMax = 18
     var sizeBackMax = 84
 
+    let alphaLyrics = 1
     const lyrics = [
       'Fly',
       'In the universe',
@@ -329,9 +346,9 @@
 
     var speeds = {
       vertical: {
-        speed: 0.01,
-        from: 2.8,
-        to: 0.01
+        speed: - 0.01,
+        from: - 2.8,
+        to: - 0.01
       },
       horizontal: {
         speed: 0.01 * 0
@@ -413,7 +430,8 @@ verticalSpeed:
 radiusSpeed:
 angularSpeed:
 oscillatorySpeedX:
-oscillatorySpeedY
+oscillatorySpeedY:
+lyricsFadeOut:
 `
       const value =
         `${JSON.stringify(keyPressedMap)}
@@ -427,6 +445,7 @@ ${speeds.radius.speed.toFixed(2)}
 ${speeds.angular.speed.toFixed(2)}
 ${oscillatorySpeedX.toFixed(2)}
 ${oscillatorySpeedY.toFixed(2)}
+${lyricsFadeOut == 2 ? 'READY' : (lyricsFadeOut ? 'PENDING' : 'FINISHED')}
 
 
 
@@ -466,7 +485,9 @@ ${oscillatorySpeedY.toFixed(2)}
 
 
     function drawLyrics() {
-      ctx.fillStyle = "red";
+
+
+      ctx.fillStyle = "rgb(255,255,0 ," + alphaLyrics + ")";
 
       ctx.font = "70px arial";
       ctx.textAlign = "start"
@@ -480,16 +501,32 @@ ${oscillatorySpeedY.toFixed(2)}
     function drawStarsFront(stars) {
       ctx.fillStyle = colors.starsFront.color.rgb;
       for (star in stars) {
+
+        ctx.fillStyle = colors.starsFront.color.rgb;
+
+
         var star = stars[star];
+
         const size = sizeFrontMax / star.z
 
-        if (showCircles)
 
-          drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
-        else ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
+        switch (starsShape) {
+          case SHOWSQUARES:
 
+            ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
+
+            break
+          case SHOWCIRCLES:
+            drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
+            break
+          case SHOWIMAGE:
+
+            ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
+
+            ctx.drawImage(img, star.x - size / 2, star.y - size / 2, size, size);
+            break
+        }
       }
-
     }
 
     function drawCircle(x, y, radius, color) {
@@ -504,10 +541,18 @@ ${oscillatorySpeedY.toFixed(2)}
       for (star in stars) {
         var star = stars[star];
         const size = sizeBackMax / star.z
-        if (showCircles)
-          drawCircle(star.x, star.y, sizeBackMax / star.z / 2, colors.starsBack.color.rgb)
-        else ctx.fillRect(star.x - size/2, star.y - size/2, size, size);
 
+        switch (starsShape) {
+          case SHOWSQUARES:
+            ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
+            break
+          case SHOWCIRCLES:
+            drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
+            break
+          case SHOWIMAGE:
+            drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
+            break
+        }
 
       }
     }
@@ -516,7 +561,7 @@ ${oscillatorySpeedY.toFixed(2)}
       ctx.fillStyle = colors.starsFront.color.rgb
       for (star in stars) {
         var star = stars[star];
-        ctx.fillRect(star.x, star.y, 0.2, 0.2);
+        ctx.fillRect(star.x, star.y, 0.3, 0.3);
 
       }
     }
@@ -542,6 +587,8 @@ ${oscillatorySpeedY.toFixed(2)}
     function updateSpeedsKeyPressed() {
 
       const ctrlPressed = keyPressedMap[17] || false
+      const leftAltPressed = keyPressedMap[18] || false
+      const spacePressed = keyPressedMap[32] || false
 
       const leftPressed = keyPressedMap[37] || false
       const upPressed = keyPressedMap[38] || false
@@ -561,14 +608,32 @@ ${oscillatorySpeedY.toFixed(2)}
 
         speeds.radius.speed += radiusBoost * (downPressed - upPressed)
         speeds.angular.speed += angularSpeedBoost * (rightPressed - leftPressed)
+      }
 
-
-
+      if (spacePressed) {
+        lyricsFadeOut = READY
+        alphaLyrics = 1
+      }
+      if (leftAltPressed) {
+        lyricsFadeOut = READY
+        alphaLyrics = 1
       }
 
 
 
 
+
+
+    }
+
+    function updateLyrics() {
+      if (lyricsFadeOut == READY) {
+        alphaLyrics = 1
+        lyricsFadeOut = PENDING
+      } else if (lyricsFadeOut == PENDING) {
+        alphaLyrics -= 0.01
+        if (alphaLyrics <= 0) lyricsFadeOut = FINISHED
+      }
 
 
     }
@@ -599,7 +664,7 @@ ${oscillatorySpeedY.toFixed(2)}
 
 
 
-
+      updateLyrics()
 
 
       updateStarsBack(dt)
