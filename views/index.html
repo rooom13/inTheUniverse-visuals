@@ -64,6 +64,11 @@
     const tStartChangeColor = 46600
     const tEndChangeColor = 54500
 
+    const tStartSecondaryLyrics = tStartChangeColor
+    const tEndSecondaryLyrics = 54600
+
+
+
 
 
     const onKeyDown = (e) => {
@@ -91,7 +96,7 @@
           lyrics.position.noise += 0.5
           break;
         case 'KeyT':
-          console.log(timeNow - startTime)
+          console.log(timeSong)
           break;
         case 'KeyQ':
           console.log('Q')
@@ -311,7 +316,7 @@
         var star = starsFarBack[star];
         const starSpeed = speeds.vertical.speed / star.z
 
-        star.y += starSpeed* 10 * dt
+        star.y += starSpeed * 10 * dt
         if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
         if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
       }
@@ -319,6 +324,47 @@
 
     var sizeFrontMax = 18
     var sizeBackMax = 84
+
+    const cvw = document.body.clientWidth
+    const cvh = document.body.clientHeight
+
+    const secondaryLyrics = {
+      speed: -3,
+      content: [
+        {
+          text: 'Ven conmigo',
+          alpha: 1,
+          tStart: tStartSecondaryLyrics,
+          position: { x: cvw / 5, y: cvh }
+        },
+        {
+          text: 'Ven conmigo',
+          alpha: 1,
+          tStart: 48600,
+          position: { x: cvw / 2, y: cvh }
+        },
+        {
+          text: 'Ven conmigo',
+          alpha: 1,
+          tStart: 50500,
+          position: { x: 4 * cvw / 5, y: cvh }
+        },
+        {
+          text: 'Al universo',
+          alpha: 1,
+          tStart: 52600,
+          position: { x: cvw / 2, y: cvh }
+
+        },
+        {
+          text: 'ven conmigo',
+          alpha: 1,
+          tStart: 53600,
+          position: { x: cvw / 2, y: cvh }
+
+        },
+      ]
+    }
 
     const lyrics = {
       isFadingOut: false,
@@ -514,6 +560,27 @@ ${lyrics.position.noise}
 
     }
 
+    function drawSecondaryLyrics() {
+
+      if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
+        ctx.font = "30px arial";
+        ctx.textAlign = "center"
+        for (i in secondaryLyrics.content) {
+          const lyric = secondaryLyrics.content[i]
+          if (timeSong >= lyric.tStart) {
+            ctx.fillStyle = "rgb(255,255,0 ," + lyric.alpha + ")";
+            ctx.fillText(lyric.text, lyric.position.x, lyric.position.y);
+  
+
+          }
+
+        }
+
+
+      }
+
+    }
+
     function drawStarsFront(stars) {
       ctx.fillStyle = colors.starsFront.color.rgb;
       for (star in stars) {
@@ -642,7 +709,7 @@ ${lyrics.position.noise}
     function updateLyrics() {
 
       if (lyrics.isFadingOut) {
-        lyrics.alpha += 0.01
+        lyrics.alpha -= 0.01
         if (lyrics.alpha <= 0) lyrics.isFadingOut = false
       }
 
@@ -652,6 +719,21 @@ ${lyrics.position.noise}
 
 
     }
+
+    function updateSecondaryLyrics() {
+      
+      if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
+        for (i in secondaryLyrics.content) {
+          const lyric = secondaryLyrics.content[i]
+          if (timeSong >= lyric.tStart) {
+
+            lyric.position.y += secondaryLyrics.speed
+            lyric.alpha -= 0.01
+          }
+        }
+      }
+    }
+
 
     //UPDATE
     function update() {
@@ -676,13 +758,17 @@ ${lyrics.position.noise}
         updateColorTransition(colors.starsFront, tStartChangeColor, tEndChangeColor)
         updateColorTransition(colors.starsBack, tStartChangeColor, tEndChangeColor)
 
+        //ven conmigo
+
+
       }
 
 
 
       updateLyrics()
+      updateSecondaryLyrics()
 
-      if(farBackStars)
+      if (farBackStars)
         updateStarsFarBack(dt)
       updateStarsBack(dt)
       updateStarsFront(dt)
@@ -704,6 +790,7 @@ ${lyrics.position.noise}
       drawStarsFront(starsFront)
 
 
+      drawSecondaryLyrics()
 
 
 
