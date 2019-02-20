@@ -563,14 +563,14 @@ ${lyrics.position.noise}
     function drawSecondaryLyrics() {
 
       if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
-        ctx.font = "30px arial";
+        ctx.font = "50px arial";
         ctx.textAlign = "center"
         for (i in secondaryLyrics.content) {
           const lyric = secondaryLyrics.content[i]
           if (timeSong >= lyric.tStart) {
-            ctx.fillStyle = "rgb(255,255,0 ," + lyric.alpha + ")";
+            ctx.fillStyle = "rgb(102, 0, 204," + lyric.alpha + ")";
             ctx.fillText(lyric.text, lyric.position.x, lyric.position.y);
-  
+
 
           }
 
@@ -721,14 +721,22 @@ ${lyrics.position.noise}
     }
 
     function updateSecondaryLyrics() {
-      
+
+
+
+
       if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
         for (i in secondaryLyrics.content) {
           const lyric = secondaryLyrics.content[i]
-          if (timeSong >= lyric.tStart) {
+          const start = lyric.tStart
+          const end = start + 3000
+          if (timeSong >= start) {
+            // I'm not refactoring this
+            lyric.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(timeSong), start), end) -start))
+            const acceleration = (0 - 1) / (end - start)
+            lyric.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
 
-            lyric.position.y += secondaryLyrics.speed
-            lyric.alpha -= 0.01
+         
           }
         }
       }
