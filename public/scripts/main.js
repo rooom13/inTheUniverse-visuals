@@ -14,7 +14,7 @@ const onKeyDown = (e) => {
   // console.log(e)
   switch (e.code) {
     case 'Digit1':
-      travelTo(tEndIntro)
+      travelTo(tStartChangeColor)
       break;
     case 'Digit2':
       travelTo(tStartChangeColor)
@@ -23,7 +23,11 @@ const onKeyDown = (e) => {
       travelTo(tEndChangeColor)
       break;
     case 'Digit4':
-      travelTo(ternaryLyrics.tStart[0] - 1000)
+    travelTo(ternaryLyrics.tStart[0] - 500)
+      break;
+    case 'Digit5':
+    travelTo(tStartChangeColor2 - 500)
+
       break;
     case 'Space':
       iLyrics.nextWord()
@@ -181,8 +185,8 @@ function updateStarsFarBack(dt) {
   }
 }
 
-const sizeFrontMax = 18
-const sizeBackMax = 84
+let sizeFrontMax = 18
+let sizeBackMax = 84
 
 const cvw = document.body.clientWidth
 const cvh = document.body.clientHeight
@@ -404,9 +408,10 @@ function updateSpeedTransition(speeds, start, end) {
   speeds.speed = speeds.from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
 }
 
-function updateColorTransition(colors, start, end) {
-  const colorSpeed = colors.to.minus(colors.from).divided(end - start)
-  colors.color = colors.from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+function updateColorTransition(colors, colorFrom, colorTo, start, end) {
+  if(!(timeSong >= start && timeSong <= end)) return;
+  const colorSpeed = colorTo.minus(colorFrom).divided(end - start)
+  colors.color = colorFrom.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
 }
 
 function updateSpeedsKeyPressed() {
@@ -491,14 +496,15 @@ function update() {
     // 1 transition, reduce speed
     updateSpeedTransition(speeds.vertical, 0, tEndIntro)
     // 2 transition, colors  inverted
-    updateColorTransition(colors.background, tStartChangeColor, tEndChangeColor)
-    updateColorTransition(colors.starsFront, tStartChangeColor, tEndChangeColor)
-    updateColorTransition(colors.starsBack, tStartChangeColor, tEndChangeColor)
   
-    // updateColorTransition(colors.background, tStartChangeColor2, tEndChangeColor2)
-    // updateColorTransition(colors.starsFront, tStartChangeColor2, tEndChangeColor2)
-    // updateColorTransition(colors.starsBack, tStartChangeColor2, tEndChangeColor)
-  
+    updateColorTransition(colors.background,colors.background.from, colors.background.to,  tStartChangeColor, tEndChangeColor)
+    updateColorTransition(colors.starsFront,colors.starsFront.from, colors.starsFront.to,  tStartChangeColor, tEndChangeColor)
+    updateColorTransition(colors.starsBack, colors.starsBack.from, colors.starsBack.to, tStartChangeColor, tEndChangeColor)
+    
+    updateColorTransition(colors.background,colors.background.to, colors.background.to2,  tStartChangeColor2, tEndChangeColor2)
+    updateColorTransition(colors.starsFront,colors.starsFront.to, colors.starsFront.to2,  tStartChangeColor2, tEndChangeColor2)
+    updateColorTransition(colors.starsBack, colors.starsBack.to, colors.starsBack.to2, tStartChangeColor2, tEndChangeColor2)
+
 
   }
   // UPDATE LYRICS
