@@ -76,7 +76,7 @@ ${lyrics.isFadingOut}
 
         // Red point to check time variance between frames
         ctx.fillStyle = 'red'
-        ctx.fillRect(canvas.width / 2, canvas.height / 2 + dt, 1, 1)
+        ctx.fillRect(canvas.width / 2, canvas.height / 2 + dt, 4, 4)
     }
 
 }

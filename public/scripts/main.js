@@ -3,11 +3,13 @@ const tEndIntro = 22700
 const tStartChangeColor = 46600
 const tEndChangeColor = 54500
 
+const tStartChangeColor2 = 92600
+const tEndChangeColor2 = 94600
+
 const tStartSecondaryLyrics = tStartChangeColor
 const tEndSecondaryLyrics = 54600
 
-
-
+let shouldDrawQuieroVolar = false
 const onKeyDown = (e) => {
   // console.log(e)
   switch (e.code) {
@@ -17,47 +19,44 @@ const onKeyDown = (e) => {
     case 'Digit2':
       travelTo(tStartChangeColor)
       break;
+    case 'Digit3':
+      travelTo(tEndChangeColor)
+      break;
+    case 'Digit4':
+      travelTo(ternaryLyrics.tStart[0] - 1000)
+      break;
     case 'Space':
-      console.log('Space')
       iLyrics.nextWord()
       break;
     case 'KeyB':
       farBackStars = !farBackStars
       break;
     case 'KeyM':
-      console.log('M')
       lyrics.position.noise -= 0.5
       break;
     case 'KeyN':
-      console.log('N')
       lyrics.position.noise += 0.5
       break;
     case 'KeyT':
       console.log(timeSong)
       break;
     case 'KeyQ':
-      console.log('Q')
       sizeFrontMax++
       break;
     case 'KeyS':
-      console.log('S')
       start()
       break;
-
     case 'KeyC':
       starsShape = (starsShape + 1) % 3
-      console.log(starsShape)
       break
-
     case 'KeyD':
       debug.toggle()
       break
   }
 }
 
-
 var debug
-var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong, dt, canvas, ctx
+var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong = 0, dt, canvas, ctx
 var songStarted = false
 let farBackStars = false
 
@@ -77,52 +76,30 @@ function start() {
   if (music.paused) {
     if (music.currentTime == 0) {
       music.currentTime += 0.096
-
       speed = speed0
     }
     startTime = performance.now() - (timeSong || 0)
-
     music.play().then(songStarted = true);
   }
   else {
     music.pause()
     songStarted = false
   }
-
-
-
-
-
-
 }
 
 function init() {
-  console.log('init')
   N = 50
   timePrev = 0
-
-
-
-
   music = new Audio('music/hello.mp3');
   img = document.getElementById("asteroid")
   initCanvas()
-
-
   debug = new DebugWindow(ctx)
-
-
   initStars()
-
   iLyrics = new InteractiveLyrics()
-
   window.requestAnimationFrame(() => { update(); render() })
 }
 
-
-
 // INITATORS
-
 function initCanvas() {
   canvas = document.querySelector("canvas");
   canvas.width = document.body.clientWidth;
@@ -133,7 +110,6 @@ function initCanvas() {
 
 function initStars() {
   for (var i = 0; i < N; ++i) {
-
     starsFront.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -157,7 +133,6 @@ function initStars() {
 
 }
 
-
 // UPDATORS
 function updateStarsFront(dt) {
   for (star in starsFront) {
@@ -174,7 +149,6 @@ function updateStarsFront(dt) {
 
     if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
     if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
-
   }
 }
 
@@ -191,12 +165,10 @@ function updateStarsBack(dt) {
     star.x += constantHorizontalSpeed * dt + oscillatorySpeedX
     star.y += constantVerticalSpeed * dt + oscillatorySpeedY
 
-
     if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
     if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
   }
 }
-
 
 function updateStarsFarBack(dt) {
   for (star in starsFarBack) {
@@ -209,29 +181,31 @@ function updateStarsFarBack(dt) {
   }
 }
 
-var sizeFrontMax = 18
-var sizeBackMax = 84
+const sizeFrontMax = 18
+const sizeBackMax = 84
 
 const cvw = document.body.clientWidth
 const cvh = document.body.clientHeight
-
 
 var colors = {
   background: {
     color: new Color(0, 0, 0),
     from: new Color(0, 0, 0),
     to: new Color(255, 255, 255),
+    to2:  new Color(0, 2, 53)
   },
   starsFront: {
     color: new Color(255, 255, 255),
     from: new Color(255, 255, 255),
     to: new Color(0, 0, 0),
+    to2: new Color(255, 240, 197)
 
   },
   starsBack: {
     color: new Color(220, 220, 220),
     from: new Color(220, 220, 220),
     to: new Color(35, 35, 35),
+    to2: new Color(251, 231, 173)
   },
   lyrics0: new Color(255, 255, 0),
   lyric1: new Color(255, 255, 0)
@@ -281,8 +255,12 @@ const secondaryLyrics = {
   ]
 }
 
-
-
+const ternaryLyrics = {
+  text: 'Quiero volar',
+  alpha: 1,
+  position: { x: null, y: cvh / 2 },
+  tStart: [77890, 85900, 133900, 141900, 149900, 157900, 165900, 173900, 181900, 253900, 261800, 269800, 277900, 285900, 293800]
+}
 
 var keyPressedMap = {}; // You could also use an array
 document.addEventListener("keydown", onKeyDown);
@@ -311,21 +289,14 @@ var speeds = {
 var oscillatorySpeedX = 0
 var oscillatorySpeedY = 0
 
-
-
-
-
 function travelTo(toTime_ms) {
   const toTime = toTime_ms / 1000
   music.currentTime = toTime
   startTime = timeNow - toTime_ms
 }
 
-
 function drawLyrics() {
-
   ctx.fillStyle = lyrics.color.rgb
-
   ctx.font = "70px arial";
   ctx.textAlign = "start"
 
@@ -334,7 +305,6 @@ function drawLyrics() {
 }
 
 function drawSecondaryLyrics() {
-
   if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
     ctx.font = "50px arial";
     ctx.textAlign = "center"
@@ -348,31 +318,41 @@ function drawSecondaryLyrics() {
   }
 }
 
+function isAnyOfThisIntervals() {
+  var veredicto = false
+  ternaryLyrics.tStart.forEach(t => { if (timeSong >= t && timeSong <= t + 1500) veredicto = t })
+  if (ternaryLyrics.position.x == null){ 
+    ternaryLyrics.position.x =  cvw  / 3 + Math.random()*cvw*2/3}
+  if(!veredicto) ternaryLyrics.position.x = null
+    return veredicto
+}
+
+function drawTernaryLyrics() {
+  if (shouldDrawQuieroVolar) {
+    ctx.font = "25px arial";
+    ctx.textAlign = "center"
+    ctx.fillStyle = "rgb(01, 255, 1," + ternaryLyrics.alpha + ")";
+    ctx.fillText(ternaryLyrics.text, ternaryLyrics.position.x, ternaryLyrics.position.y);
+
+  }
+}
+
 function drawStarsFront(stars) {
   ctx.fillStyle = colors.starsFront.color.rgb;
   for (star in stars) {
-
     ctx.fillStyle = colors.starsFront.color.rgb;
-
-
     var star = stars[star];
-
     const size = sizeFrontMax / star.z
-
 
     switch (starsShape) {
       case SHOWSQUARES:
-
         ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
-
         break
       case SHOWCIRCLES:
         drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
         break
       case SHOWIMAGE:
-
         ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
-
         ctx.drawImage(img, star.x - size / 2, star.y - size / 2, size, size);
         break
     }
@@ -403,7 +383,6 @@ function drawStarsBack(stars) {
         drawCircle(star.x, star.y, size / 2, colors.starsFront.color.rgb)
         break
     }
-
   }
 }
 
@@ -412,7 +391,6 @@ function drawStarsFarBack(stars) {
   for (star in stars) {
     var star = stars[star];
     ctx.fillRect(star.x, star.y, 0.3, 0.3);
-
   }
 }
 
@@ -421,25 +399,20 @@ function drawBackground() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-
 function updateSpeedTransition(speeds, start, end) {
   const acceleration = (speeds.to - speeds.from) / (end - start)
   speeds.speed = speeds.from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
-
 }
 
 function updateColorTransition(colors, start, end) {
   const colorSpeed = colors.to.minus(colors.from).divided(end - start)
   colors.color = colors.from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
-
 }
 
 function updateSpeedsKeyPressed() {
-
   const ctrlPressed = keyPressedMap[17] || false
   const leftAltPressed = keyPressedMap[18] || false
   const spacePressed = keyPressedMap[32] || false
-
   const leftPressed = keyPressedMap[37] || false
   const upPressed = keyPressedMap[38] || false
   const rightPressed = keyPressedMap[39] || false
@@ -448,18 +421,14 @@ function updateSpeedsKeyPressed() {
   const boost = 0.005
 
   if (!ctrlPressed) {
-
     speeds.vertical.speed += boost * (downPressed - upPressed)
     speeds.horizontal.speed += boost * (rightPressed - leftPressed)
-
   } else {
     const radiusBoost = 0.05
     const angularSpeedBoost = 0.05
-
     speeds.radius.speed += radiusBoost * (downPressed - upPressed)
     speeds.angular.speed += angularSpeedBoost * (rightPressed - leftPressed)
   }
-
   if (spacePressed) {
     lyrics.isFadingOut = true
     lyrics.color.alpha = 1
@@ -467,14 +436,12 @@ function updateSpeedsKeyPressed() {
 }
 
 function updateLyrics() {
-
   if (lyrics.isFadingOut) {
     lyrics.color.alpha -= 0.01
     if (lyrics.color.alpha <= 0) lyrics.isFadingOut = false
   }
   lyrics.position.x = canvas.width / 2 + Math.cos(timeNow / 1000) * 20
   lyrics.position.y = canvas.height / 2 + Math.sin(timeNow / 1000) * 10
-
   if (timeSong >= tEndChangeColor) lyrics.Color = new Color
 }
 
@@ -494,9 +461,25 @@ function updateSecondaryLyrics() {
   }
 }
 
+function updateTernaryLyrics() {
+  shouldDrawQuieroVolar = isAnyOfThisIntervals()
+
+  if (shouldDrawQuieroVolar) {
+    const start = shouldDrawQuieroVolar
+    const end = start + 1500
+    if (timeSong >= start) {
+      // I'm not refactoring this
+      // ternaryLyrics.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      const acceleration = (0 - 1) / (end - start)
+      ternaryLyrics.position.y = cvh + (-0.05 * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      ternaryLyrics.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+    }
+  }
+}
+
+
 //UPDATE
 function update() {
-
   timeNow = performance.now()
   dt = timeNow - timePrev
   timePrev = timeNow
@@ -511,36 +494,34 @@ function update() {
     updateColorTransition(colors.background, tStartChangeColor, tEndChangeColor)
     updateColorTransition(colors.starsFront, tStartChangeColor, tEndChangeColor)
     updateColorTransition(colors.starsBack, tStartChangeColor, tEndChangeColor)
+  
+    // updateColorTransition(colors.background, tStartChangeColor2, tEndChangeColor2)
+    // updateColorTransition(colors.starsFront, tStartChangeColor2, tEndChangeColor2)
+    // updateColorTransition(colors.starsBack, tStartChangeColor2, tEndChangeColor)
+  
 
   }
-
   // UPDATE LYRICS
   updateLyrics()
   updateSecondaryLyrics()
-
+  updateTernaryLyrics()
   // UPDATE STARS
   if (farBackStars)
     updateStarsFarBack(dt)
   updateStarsBack(dt)
   updateStarsFront(dt)
-
 }
 
 //RENDER
 function render() {
-
   drawBackground()
   if (farBackStars) drawStarsFarBack(starsFarBack)
   drawStarsBack(starsBack)
-
   drawLyrics()
-
   drawStarsFront(starsFront)
-
   drawSecondaryLyrics()
-
+  drawTernaryLyrics()
   debug.render()
-
   window.requestAnimationFrame(() => { update(); render() });
 }
 

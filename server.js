@@ -25,8 +25,8 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', function homepage(req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
-app.get('/robo', function homepage(req, res) {
-  res.sendFile(__dirname + '/views/robo.html');
+app.get('/dj', function homepage(req, res) {
+  res.sendFile(__dirname + '/views/dj.html');
 });
 
 
