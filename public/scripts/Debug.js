@@ -47,8 +47,8 @@ ${speeds.horizontal.speed.toFixed(2)}
 ${speeds.vertical.speed.toFixed(2)}
 ${speeds.radius.speed.toFixed(2)}
 ${speeds.angular.speed.toFixed(2)}
-${oscillatorySpeedX.toFixed(2)}
-${oscillatorySpeedY.toFixed(2)}
+${speeds.oscillatorySpeedX.speed.toFixed(2)}
+${speeds.oscillatorySpeedY.speed.toFixed(2)}
 ${lyrics.position.noise}
 ${lyrics.isFadingOut}
 `

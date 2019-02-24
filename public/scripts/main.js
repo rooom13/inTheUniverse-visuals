@@ -23,14 +23,15 @@ const onKeyDown = (e) => {
       travelTo(tEndChangeColor)
       break;
     case 'Digit4':
-    travelTo(ternaryLyrics.tStart[0] - 500)
+      travelTo(ternaryLyrics.tStart[0] - 500)
       break;
     case 'Digit5':
-    travelTo(tStartChangeColor2 - 500)
-
+      travelTo(tStartChangeColor2 - 500)
       break;
     case 'Space':
       iLyrics.nextWord()
+      lyrics.isFadingOut = true
+      lyrics.color.alpha = 1 
       break;
     case 'KeyB':
       farBackStars = !farBackStars
@@ -56,6 +57,19 @@ const onKeyDown = (e) => {
     case 'KeyD':
       debug.toggle()
       break
+    case 'KeyR':
+      speeds.saved = {
+        start: timeSong,
+        end: timeSong + 2000,
+        vertical: speeds.vertical.speed,
+        horizontal: speeds.horizontal.speed,
+        radius: speeds.radius.speed,
+        angular: speeds.angular.speed,
+        oscillatorySpeedX: speeds.oscillatorySpeedX.speed,
+        oscillatorySpeedY: speeds.oscillatorySpeedY.speed
+      }
+      speeds.reset = true
+      break
   }
 }
 
@@ -80,7 +94,7 @@ function start() {
   if (music.paused) {
     if (music.currentTime == 0) {
       music.currentTime += 0.096
-      speed = speed0
+      // speed = speed0
     }
     startTime = performance.now() - (timeSong || 0)
     music.play().then(songStarted = true);
@@ -134,7 +148,6 @@ function initStars() {
       z: 80 + Math.random() * 1
     });
   }
-
 }
 
 // UPDATORS
@@ -145,11 +158,11 @@ function updateStarsFront(dt) {
     const constantHorizontalSpeed = speeds.horizontal.speed / star.z
     const constantVerticalSpeed = speeds.vertical.speed / star.z
 
-    oscillatorySpeedX = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
-    oscillatorySpeedY = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
 
-    star.x += constantHorizontalSpeed * dt + oscillatorySpeedX
-    star.y += constantVerticalSpeed * dt + oscillatorySpeedY
+    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
+    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
 
     if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
     if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
@@ -163,11 +176,11 @@ function updateStarsBack(dt) {
     const constantHorizontalSpeed = speeds.horizontal.speed / star.z
     const constantVerticalSpeed = speeds.vertical.speed / star.z
 
-    oscillatorySpeedX = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
-    oscillatorySpeedY = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
 
-    star.x += constantHorizontalSpeed * dt + oscillatorySpeedX
-    star.y += constantVerticalSpeed * dt + oscillatorySpeedY
+    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
+    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
 
     if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
     if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
@@ -196,7 +209,7 @@ var colors = {
     color: new Color(0, 0, 0),
     from: new Color(0, 0, 0),
     to: new Color(255, 255, 255),
-    to2:  new Color(0, 2, 53)
+    to2: new Color(0, 2, 53)
   },
   starsFront: {
     color: new Color(255, 255, 255),
@@ -275,6 +288,12 @@ onkeydown = onkeyup = function (e) {
 }
 
 var speeds = {
+  keys: {
+    radius: 0,
+    angular: 0,
+    vertical: 0,
+    horizontal: 0,
+  },
   vertical: {
     speed: - 0.01,
     from: - 2.8,
@@ -288,10 +307,25 @@ var speeds = {
   },
   angular: {
     speed: 0.5 * 0
-  }
+  },
+  oscillatorySpeedX: {
+    speed: 0
+  },
+  oscillatorySpeedY: {
+    speed: 0
+  },
+  saved: {
+    start: null,
+    end: null,
+    vertical: null,
+    horizontal: null,
+    radius: null,
+    angular: null,
+    oscillatorySpeedX: null,
+    oscillatorySpeedY: null
+  },
+  reset: false
 }
-var oscillatorySpeedX = 0
-var oscillatorySpeedY = 0
 
 function travelTo(toTime_ms) {
   const toTime = toTime_ms / 1000
@@ -325,10 +359,11 @@ function drawSecondaryLyrics() {
 function isAnyOfThisIntervals() {
   var veredicto = false
   ternaryLyrics.tStart.forEach(t => { if (timeSong >= t && timeSong <= t + 1500) veredicto = t })
-  if (ternaryLyrics.position.x == null){ 
-    ternaryLyrics.position.x =  cvw  / 3 + Math.random()*cvw*2/3}
-  if(!veredicto) ternaryLyrics.position.x = null
-    return veredicto
+  if (ternaryLyrics.position.x == null) {
+    ternaryLyrics.position.x = cvw / 3 + Math.random() * cvw * 2 / 3
+  }
+  if (!veredicto) ternaryLyrics.position.x = null
+  return veredicto
 }
 
 function drawTernaryLyrics() {
@@ -337,7 +372,6 @@ function drawTernaryLyrics() {
     ctx.textAlign = "center"
     ctx.fillStyle = "rgb(01, 255, 1," + ternaryLyrics.alpha + ")";
     ctx.fillText(ternaryLyrics.text, ternaryLyrics.position.x, ternaryLyrics.position.y);
-
   }
 }
 
@@ -403,15 +437,56 @@ function drawBackground() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function updateSpeedTransition(speeds, start, end) {
-  const acceleration = (speeds.to - speeds.from) / (end - start)
-  speeds.speed = speeds.from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+function updateResetAllSpeedsTransition() {
+  const start = speeds.saved.start
+  const end = start + 5000
+
+  speeds.keys.vertical = speedTransition(speeds.saved.vertical, 0, start, end)
+  speeds.keys.horizontal = speedTransition(speeds.saved.horizontal, 0, start, end)
+  speeds.keys.radius = speedTransition(speeds.saved.radius, 0, start, end)
+  speeds.keys.angular = speedTransition(speeds.saved.angular, 0, start, end)
+  speeds.keys.oscillatorySpeedX = speedTransition(speeds.saved.oscillatorySpeedX, 0, start, end)
+  speeds.keys.oscillatorySpeedY = speedTransition(speeds.saved.oscillatorySpeedY, 0, start, end)
+
+  if (timeSong > end) speeds.reset = false
 }
 
-function updateColorTransition(colors, colorFrom, colorTo, start, end) {
-  if(!(timeSong >= start && timeSong <= end)) return;
-  const colorSpeed = colorTo.minus(colorFrom).divided(end - start)
-  colors.color = colorFrom.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+function speedTransition(from, to, start, end) {
+  const acceleration = (to - from) / (end - start)
+  return from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+}
+
+function colorTransition(from, to, start, end) {
+  const colorSpeed = to.minus(from).divided(end - start)
+  return from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+}
+
+function updateSpeeds() {
+
+  updateSpeedsKeyPressed()
+  if (speeds.reset) updateResetAllSpeedsTransition()
+
+  //vertical
+  const introSpeed = speedTransition(speeds.vertical.from, speeds.vertical.to, 0, tEndIntro)
+  speeds.vertical.speed = introSpeed + speeds.keys.vertical
+
+  speeds.horizontal.speed = speeds.keys.horizontal
+  speeds.angular.speed = speeds.keys.angular
+  speeds.radius.speed = speeds.keys.radius
+  speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
+  speeds.oscillatorySpeedY.speed = speeds.keys.oscillatorySpeedX
+}
+function updateColors() {
+
+  if (timeSong <= tStartChangeColor2){
+    colors.background.color = colorTransition(colors.background.from, colors.background.to, tStartChangeColor, tEndChangeColor)
+    colors.starsFront.color = colorTransition(colors.starsFront.from, colors.starsFront.to, tStartChangeColor, tEndChangeColor)
+    colors.starsBack.color = colorTransition(colors.starsBack.from, colors.starsBack.to, tStartChangeColor, tEndChangeColor)
+  } else {
+    colors.background.color = colorTransition(colors.background.to, colors.background.to2, tStartChangeColor2, tEndChangeColor2)
+    colors.starsFront.color = colorTransition(colors.starsFront.to, colors.starsFront.to2, tStartChangeColor2, tEndChangeColor2)
+    colors.starsBack.color = colorTransition(colors.starsBack.to, colors.starsBack.to2, tStartChangeColor2, tEndChangeColor2)
+  }
 }
 
 function updateSpeedsKeyPressed() {
@@ -426,17 +501,12 @@ function updateSpeedsKeyPressed() {
   const boost = 0.005
 
   if (!ctrlPressed) {
-    speeds.vertical.speed += boost * (downPressed - upPressed)
-    speeds.horizontal.speed += boost * (rightPressed - leftPressed)
+    speeds.vertical.speed +=
+      speeds.keys.vertical += boost * (downPressed - upPressed)
+    speeds.keys.horizontal += boost * (rightPressed - leftPressed)
   } else {
-    const radiusBoost = 0.05
-    const angularSpeedBoost = 0.05
-    speeds.radius.speed += radiusBoost * (downPressed - upPressed)
-    speeds.angular.speed += angularSpeedBoost * (rightPressed - leftPressed)
-  }
-  if (spacePressed) {
-    lyrics.isFadingOut = true
-    lyrics.color.alpha = 1
+    speeds.keys.radius += boost * (downPressed - upPressed)
+    speeds.keys.angular += boost * (rightPressed - leftPressed)
   }
 }
 
@@ -447,6 +517,7 @@ function updateLyrics() {
   }
   lyrics.position.x = canvas.width / 2 + Math.cos(timeNow / 1000) * 20
   lyrics.position.y = canvas.height / 2 + Math.sin(timeNow / 1000) * 10
+
   if (timeSong >= tEndChangeColor) lyrics.Color = new Color
 }
 
@@ -489,23 +560,11 @@ function update() {
   dt = timeNow - timePrev
   timePrev = timeNow
 
-  updateSpeedsKeyPressed()
-
   if (songStarted) {
     timeSong = timeNow - startTime
-    // 1 transition, reduce speed
-    updateSpeedTransition(speeds.vertical, 0, tEndIntro)
-    // 2 transition, colors  inverted
-  
-    updateColorTransition(colors.background,colors.background.from, colors.background.to,  tStartChangeColor, tEndChangeColor)
-    updateColorTransition(colors.starsFront,colors.starsFront.from, colors.starsFront.to,  tStartChangeColor, tEndChangeColor)
-    updateColorTransition(colors.starsBack, colors.starsBack.from, colors.starsBack.to, tStartChangeColor, tEndChangeColor)
-    
-    updateColorTransition(colors.background,colors.background.to, colors.background.to2,  tStartChangeColor2, tEndChangeColor2)
-    updateColorTransition(colors.starsFront,colors.starsFront.to, colors.starsFront.to2,  tStartChangeColor2, tEndChangeColor2)
-    updateColorTransition(colors.starsBack, colors.starsBack.to, colors.starsBack.to2, tStartChangeColor2, tEndChangeColor2)
 
-
+    updateSpeeds()
+    updateColors()
   }
   // UPDATE LYRICS
   updateLyrics()
