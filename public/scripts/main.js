@@ -1,4 +1,3 @@
-
 const tEndIntro = 22700
 const tStartChangeColor = 46600
 const tEndChangeColor = 54500
@@ -8,6 +7,15 @@ const tEndChangeColor2 = 94600
 
 const tStartSecondaryLyrics = tStartChangeColor
 const tEndSecondaryLyrics = 54600
+
+const tPlatillos = 102700
+let sizePoingOscillation = 0
+
+let tremolo = {
+  size: 0,
+  tStart: [ 102600, 110500, 11900 ]
+
+}
 
 let shouldDrawQuieroVolar = false
 const onKeyDown = (e) => {
@@ -20,18 +28,18 @@ const onKeyDown = (e) => {
       travelTo(tStartChangeColor)
       break;
     case 'Digit3':
-      travelTo(tEndChangeColor)
-      break;
-    case 'Digit4':
       travelTo(ternaryLyrics.tStart[0] - 500)
       break;
-    case 'Digit5':
+    case 'Digit4':
       travelTo(tStartChangeColor2 - 500)
+      break;
+    case 'Digit5':
+      travelTo(tPlatillos - 1000)
       break;
     case 'Space':
       iLyrics.nextWord()
       lyrics.isFadingOut = true
-      lyrics.color.alpha = 1 
+      lyrics.color.alpha = 1
       break;
     case 'KeyB':
       farBackStars = !farBackStars
@@ -46,7 +54,12 @@ const onKeyDown = (e) => {
       console.log(timeSong)
       break;
     case 'KeyQ':
-      sizeFrontMax++
+      // sizeFrontMax += 3
+      sizeoscillator += 0.5
+      break;
+    case 'KeyA':
+      sizeoscillator -= 0.5
+      // sizeFrontMax-=3
       break;
     case 'KeyS':
       start()
@@ -98,6 +111,7 @@ function start() {
     }
     startTime = performance.now() - (timeSong || 0)
     music.play().then(songStarted = true);
+    music.playbackRate = 1;
   }
   else {
     music.pause()
@@ -204,6 +218,8 @@ let sizeBackMax = 84
 const cvw = document.body.clientWidth
 const cvh = document.body.clientHeight
 
+let sizeoscillator = 0
+
 var colors = {
   background: {
     color: new Color(0, 0, 0),
@@ -309,7 +325,7 @@ var speeds = {
     speed: 0.5 * 0
   },
   oscillatorySpeedX: {
-    speed: 0
+    speed: 10
   },
   oscillatorySpeedY: {
     speed: 0
@@ -356,14 +372,11 @@ function drawSecondaryLyrics() {
   }
 }
 
-function isAnyOfThisIntervals() {
+function isAnyOfThisIntervals(intervals) {
   var veredicto = false
-  ternaryLyrics.tStart.forEach(t => { if (timeSong >= t && timeSong <= t + 1500) veredicto = t })
-  if (ternaryLyrics.position.x == null) {
-    ternaryLyrics.position.x = cvw / 3 + Math.random() * cvw * 2 / 3
-  }
-  if (!veredicto) ternaryLyrics.position.x = null
+  intervals.forEach(t => { if (timeSong >= t && timeSong <= t + 1500) veredicto = t })
   return veredicto
+
 }
 
 function drawTernaryLyrics() {
@@ -377,10 +390,15 @@ function drawTernaryLyrics() {
 
 function drawStarsFront(stars) {
   ctx.fillStyle = colors.starsFront.color.rgb;
-  for (star in stars) {
+  for (i in stars) {
     ctx.fillStyle = colors.starsFront.color.rgb;
-    var star = stars[star];
-    const size = sizeFrontMax / star.z
+    var star = stars[i];
+
+    const oscillation = Math.cos(timeSong / 100 + Math.PI)
+
+    const constantoscillation = sizeoscillator * Math.cos(timeSong / 100 + i * Math.PI / 2)
+    const poingOscillation = tremolo.size * oscillation
+    const size = sizeFrontMax / star.z + constantoscillation + poingOscillation
 
     switch (starsShape) {
       case SHOWSQUARES:
@@ -406,9 +424,13 @@ function drawCircle(x, y, radius, color) {
 
 function drawStarsBack(stars) {
   ctx.fillStyle = colors.starsBack.color.rgb
-  for (star in stars) {
-    var star = stars[star];
-    const size = sizeBackMax / star.z
+  for (i in stars) {
+    var star = stars[i];
+
+    const oscillation = Math.cos(timeSong / 100 + Math.PI)
+    const constantoscillation = sizeoscillator * Math.cos(timeSong / 100 + i * Math.PI / 2)
+    const poingOscillation = tremolo.size * oscillation
+    const size = sizeBackMax / star.z + constantoscillation + poingOscillation
 
     switch (starsShape) {
       case SHOWSQUARES:
@@ -478,7 +500,7 @@ function updateSpeeds() {
 }
 function updateColors() {
 
-  if (timeSong <= tStartChangeColor2){
+  if (timeSong <= tStartChangeColor2) {
     colors.background.color = colorTransition(colors.background.from, colors.background.to, tStartChangeColor, tEndChangeColor)
     colors.starsFront.color = colorTransition(colors.starsFront.from, colors.starsFront.to, tStartChangeColor, tEndChangeColor)
     colors.starsBack.color = colorTransition(colors.starsBack.from, colors.starsBack.to, tStartChangeColor, tEndChangeColor)
@@ -537,8 +559,28 @@ function updateSecondaryLyrics() {
   }
 }
 
+function updateTremoloSize() {
+  shouldTremolo = isAnyOfThisIntervals(tremolo.tStart)
+  if (shouldTremolo) {
+    // console.log(1)
+    const start = shouldTremolo
+    const end = start + 1600
+    if (timeSong >= start) {
+      // I'm not refactoring this
+      const acceleration = (0 - 3) / (end - start)
+      tremolo.size = 3 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      console.log(tremolo.size)
+    }
+  }
+}
+
 function updateTernaryLyrics() {
-  shouldDrawQuieroVolar = isAnyOfThisIntervals()
+  shouldDrawQuieroVolar = isAnyOfThisIntervals(ternaryLyrics.tStart)
+
+  if (ternaryLyrics.position.x == null) {
+    ternaryLyrics.position.x = cvw / 3 + Math.random() * cvw * 2 / 3
+  }
+  if (!shouldDrawQuieroVolar) ternaryLyrics.position.x = null
 
   if (shouldDrawQuieroVolar) {
     const start = shouldDrawQuieroVolar
@@ -570,11 +612,16 @@ function update() {
   updateLyrics()
   updateSecondaryLyrics()
   updateTernaryLyrics()
+
+  updateTremoloSize()
+
   // UPDATE STARS
   if (farBackStars)
     updateStarsFarBack(dt)
   updateStarsBack(dt)
   updateStarsFront(dt)
+
+
 }
 
 //RENDER
