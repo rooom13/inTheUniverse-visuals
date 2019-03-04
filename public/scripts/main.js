@@ -13,7 +13,7 @@ let sizePoingOscillation = 0
 
 let tremolo = {
   size: 0,
-  tStart: [ 102600, 110500, 11900 ]
+  tStart: [102600, 110500, 11900]
 
 }
 
@@ -25,16 +25,15 @@ const onKeyDown = (e) => {
       travelTo(tStartChangeColor)
       break;
     case 'Digit2':
-      travelTo(tStartChangeColor)
-      break;
-    case 'Digit3':
       travelTo(ternaryLyrics.tStart[0] - 500)
       break;
-    case 'Digit4':
+    case 'Digit3':
       travelTo(tStartChangeColor2 - 500)
       break;
-    case 'Digit5':
+    case 'Digit4':
       travelTo(tPlatillos - 1000)
+      break;
+    case 'Digit5':
       break;
     case 'Space':
       iLyrics.nextWord()
@@ -65,10 +64,13 @@ const onKeyDown = (e) => {
       start()
       break;
     case 'KeyC':
-      starsShape = (starsShape + 1) % 3
+      starsShape = (starsShape + 1) % 2
       break
-    case 'KeyD':
-      debug.toggle()
+    case 'KeyP':
+      travelTo(timeSong + 3000)
+      break
+    case 'KeyO':
+      travelTo(timeSong - 3000)
       break
     case 'KeyR':
       speeds.saved = {
