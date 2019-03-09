@@ -9,11 +9,21 @@ const tStartSecondaryLyrics = tStartChangeColor
 const tEndSecondaryLyrics = 54600
 
 const tPlatillos = 102700
+
+const tChangeShape = 119100
+
+const tToLeftSpeed = 150565
+const tToLeftSpeed2 = 158575
+const tToLeftSpeed3 = 166602
+const tToLeftSpeed4 = 174584
+const tToDown = 182592
+
+
 let sizePoingOscillation = 0
 
 let tremolo = {
   size: 0,
-  tStart: [102600, 110500, 11900]
+  tStart: [102600, 110500, tChangeShape]
 
 }
 
@@ -33,7 +43,8 @@ const onKeyDown = (e) => {
     case 'Digit4':
       travelTo(tPlatillos - 1000)
       break;
-    case 'Digit5':
+      case 'Digit5':
+      travelTo(tToLeftSpeed - 1000)
       break;
     case 'Space':
       iLyrics.nextWord()
@@ -64,7 +75,7 @@ const onKeyDown = (e) => {
       start()
       break;
     case 'KeyC':
-      starsShape = (starsShape + 1) % 2
+      starsShape = (starsShape + 1) % 2  
       break
     case 'KeyP':
       travelTo(timeSong + 3000)
@@ -165,6 +176,8 @@ function initStars() {
     });
   }
 }
+
+
 
 // UPDATORS
 function updateStarsFront(dt) {
@@ -318,7 +331,10 @@ var speeds = {
     to: - 0.01
   },
   horizontal: {
-    speed: 0.01 * 0
+    speed: 0,
+    from: 0,
+    increment: 0.25
+
   },
   radius: {
     speed: 0.1 * 0
@@ -491,10 +507,19 @@ function updateSpeeds() {
   if (speeds.reset) updateResetAllSpeedsTransition()
 
   //vertical
-  const introSpeed = speedTransition(speeds.vertical.from, speeds.vertical.to, 0, tEndIntro)
-  speeds.vertical.speed = introSpeed + speeds.keys.vertical
 
-  speeds.horizontal.speed = speeds.keys.horizontal
+  
+  const introSpeed = speedTransition(speeds.vertical.from, speeds.vertical.to, 0, tEndIntro)
+   const goDown = speedTransition(0, +0.02, tToDown, tToDown + 6000)
+  speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown
+
+
+  const toLeft1 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed, tToLeftSpeed + 3000)
+  const toLeft2 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed2, tToLeftSpeed2 + 3000)
+  const toLeft3 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed3, tToLeftSpeed3 + 3000)
+  const toLeft4 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed4, tToLeftSpeed4 + 3000)
+  const resetToLeft = speedTransition(0, -4*speeds.horizontal.increment, tToDown, tToDown + 12000)
+  speeds.horizontal.speed = speeds.keys.horizontal +  toLeft1 + toLeft2 + toLeft3 + toLeft4 + resetToLeft
   speeds.angular.speed = speeds.keys.angular
   speeds.radius.speed = speeds.keys.radius
   speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
@@ -534,6 +559,15 @@ function updateSpeedsKeyPressed() {
   }
 }
 
+function updateShape(){
+  let shape = 0
+  if(timeSong >= tChangeShape){
+    shape = 1  
+  }
+
+  starsShape = shape
+}
+
 function updateLyrics() {
   if (lyrics.isFadingOut) {
     lyrics.color.alpha -= 0.01
@@ -564,14 +598,12 @@ function updateSecondaryLyrics() {
 function updateTremoloSize() {
   shouldTremolo = isAnyOfThisIntervals(tremolo.tStart)
   if (shouldTremolo) {
-    // console.log(1)
     const start = shouldTremolo
     const end = start + 1600
     if (timeSong >= start) {
       // I'm not refactoring this
       const acceleration = (0 - 3) / (end - start)
       tremolo.size = 3 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
-      console.log(tremolo.size)
     }
   }
 }
@@ -616,12 +648,16 @@ function update() {
   updateTernaryLyrics()
 
   updateTremoloSize()
+ updateShape()
+
 
   // UPDATE STARS
   if (farBackStars)
     updateStarsFarBack(dt)
   updateStarsBack(dt)
   updateStarsFront(dt)
+
+
 
 
 }

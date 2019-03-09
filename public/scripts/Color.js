@@ -39,7 +39,6 @@ class Color {
 
 
     get rgb() {
-        // console.log(this)
       return `rgb(${this.r}, ${this.g}, ${this.b}, ${this.alpha})`
     }
   }
