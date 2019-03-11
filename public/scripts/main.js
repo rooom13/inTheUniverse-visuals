@@ -5,25 +5,49 @@ const tEndChangeColor = 54500
 const tStartChangeColor2 = 92600
 const tEndChangeColor2 = 94600
 
+const tStartChangeColor3 = 222600
+const tEndChangeColor3 = 230600
+
+const tStartChangeColor4 = 251600
+const tEndChangeColor4 = 254500
+
 const tStartSecondaryLyrics = tStartChangeColor
 const tEndSecondaryLyrics = 54600
+
+const tStartSecondaryLyrics2 = tStartChangeColor3
+const tEndSecondaryLyrics2 = tEndChangeColor3
 
 const tPlatillos = 102700
 
 const tChangeShape = 119100
+const tChangeShape2 = 182649
 
 const tToLeftSpeed = 150565
 const tToLeftSpeed2 = 158575
 const tToLeftSpeed3 = 166602
 const tToLeftSpeed4 = 174584
 const tToDown = 182592
+const tToLeftSpeedEnd = 198635
+
+const tToLeftSpeedFinal = 286600
+const tToLeftSpeedFinalEnd = 294600
+
+const tStartTremolo = 254636
+const tEndTremolo = 270656
+const tClimaxTremolo = (tStartTremolo + tEndTremolo) /2
+
+const tTornado = 286656
+const tFinal = 303000
+
+
+
 
 
 let sizePoingOscillation = 0
 
 let tremolo = {
   size: 0,
-  tStart: [102600, 110500, tChangeShape]
+  tStart: [102600, 110500, tChangeShape, tChangeShape2, tStartTremolo ]
 
 }
 
@@ -45,6 +69,15 @@ const onKeyDown = (e) => {
       break;
       case 'Digit5':
       travelTo(tToLeftSpeed - 1000)
+      break;
+      case 'Digit6':
+      travelTo(tStartTremolo - 1000)
+      break;
+      case 'Digit7':
+      travelTo(tEndTremolo - 1000)
+      break;
+      case 'Digit8':
+      travelTo(tTornado - 1000)
       break;
     case 'Space':
       iLyrics.nextWord()
@@ -102,7 +135,7 @@ const onKeyDown = (e) => {
 var debug
 var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong = 0, dt, canvas, ctx
 var songStarted = false
-let farBackStars = false
+let farBackStars = true
 
 const SHOWSQUARES = 0
 const SHOWCIRCLES = 1
@@ -219,7 +252,7 @@ function updateStarsBack(dt) {
 function updateStarsFarBack(dt) {
   for (star in starsFarBack) {
     var star = starsFarBack[star];
-    const starSpeed = speeds.vertical.speed / star.z
+    const starSpeed = speeds.vertical.to / star.z
 
     star.y += starSpeed * 10 * dt
     if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
@@ -300,6 +333,40 @@ const secondaryLyrics = {
       position: { x: cvw / 2, y: cvh }
 
     },
+    // ROUND 2
+    {
+      text: 'Ven conmigo',
+      alpha: 1,
+      tStart: tStartSecondaryLyrics2,
+      position: { x: cvw / 5, y: cvh }
+    },
+    {
+      text: 'Ven conmigo',
+      alpha: 1,
+      tStart: 224663,
+      position: { x: cvw / 2, y: cvh }
+    },
+    {
+      text: 'Ven conmigo',
+      alpha: 1,
+      tStart: 226655,
+      position: { x: 4 * cvw / 5, y: cvh }
+    },
+    {
+      text: 'Al universo',
+      alpha: 1,
+      tStart: 228630,
+      position: { x: cvw / 2, y: cvh }
+
+    },
+    {
+      text: 'ven conmigo',
+      alpha: 1,
+      tStart: 229608,
+      position: { x: cvw / 2, y: cvh }
+
+    },
+    
   ]
 }
 
@@ -337,10 +404,14 @@ var speeds = {
 
   },
   radius: {
-    speed: 0.1 * 0
+    speed: 0,
+    from: 0,
+    to : -4.15
   },
   angular: {
-    speed: 0.5 * 0
+    speed: 0,
+    from: 0,
+    to: 1.75
   },
   oscillatorySpeedX: {
     speed: 10
@@ -377,7 +448,9 @@ function drawLyrics() {
 }
 
 function drawSecondaryLyrics() {
-  if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
+  if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics ||
+    timeSong >= tStartSecondaryLyrics2 && timeSong <= tEndSecondaryLyrics2
+    ) {
     ctx.font = "50px arial";
     ctx.textAlign = "center"
     for (i in secondaryLyrics.content) {
@@ -399,7 +472,7 @@ function isAnyOfThisIntervals(intervals) {
 
 function drawTernaryLyrics() {
   if (shouldDrawQuieroVolar) {
-    ctx.font = "25px arial";
+    ctx.font = "40px arial";
     ctx.textAlign = "center"
     ctx.fillStyle = "rgb(01, 255, 1," + ternaryLyrics.alpha + ")";
     ctx.fillText(ternaryLyrics.text, ternaryLyrics.position.x, ternaryLyrics.position.y);
@@ -510,31 +583,53 @@ function updateSpeeds() {
 
   
   const introSpeed = speedTransition(speeds.vertical.from, speeds.vertical.to, 0, tEndIntro)
-   const goDown = speedTransition(0, +0.02, tToDown, tToDown + 6000)
-  speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown
+  const goDown = speedTransition(0, +0.02, tToDown, tToLeftSpeedEnd)
 
+  const goUp = speedTransition(0, -3, tToLeftSpeedFinalEnd,tFinal + 1000)
+
+  speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown + goUp
 
   const toLeft1 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed, tToLeftSpeed + 3000)
   const toLeft2 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed2, tToLeftSpeed2 + 3000)
   const toLeft3 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed3, tToLeftSpeed3 + 3000)
   const toLeft4 = speedTransition(0, speeds.horizontal.increment, tToLeftSpeed4, tToLeftSpeed4 + 3000)
-  const resetToLeft = speedTransition(0, -4*speeds.horizontal.increment, tToDown, tToDown + 12000)
-  speeds.horizontal.speed = speeds.keys.horizontal +  toLeft1 + toLeft2 + toLeft3 + toLeft4 + resetToLeft
-  speeds.angular.speed = speeds.keys.angular
-  speeds.radius.speed = speeds.keys.radius
+  const resetToLeft = speedTransition(0, -4*speeds.horizontal.increment, tToDown, tToLeftSpeedEnd)
+  const leftTransition1 = toLeft1 +  toLeft2 + toLeft3 + toLeft4 + resetToLeft
+  
+  // FINAL
+  const toLeftFinal = speedTransition(0, 3, tTornado, tToLeftSpeedFinalEnd)
+  const resetToLeftFinal = speedTransition(0, -3, tToLeftSpeedFinalEnd, tFinal)
+  const leftTransition2 = toLeftFinal + resetToLeftFinal
+  speeds.horizontal.speed = speeds.keys.horizontal + leftTransition1 + leftTransition2  
+  
+  speeds.angular.speed = speeds.keys.angular + speedTransition(speeds.angular.from, speeds.angular.to, tEndTremolo, tEndTremolo + 10000)
+  speeds.radius.speed = speeds.keys.radius + speedTransition(speeds.radius.from, speeds.radius.to, tEndTremolo , tEndTremolo + 20000)
+
   speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
   speeds.oscillatorySpeedY.speed = speeds.keys.oscillatorySpeedX
 }
 function updateColors() {
 
+  // 1st transition (black - white)
   if (timeSong <= tStartChangeColor2) {
     colors.background.color = colorTransition(colors.background.from, colors.background.to, tStartChangeColor, tEndChangeColor)
     colors.starsFront.color = colorTransition(colors.starsFront.from, colors.starsFront.to, tStartChangeColor, tEndChangeColor)
     colors.starsBack.color = colorTransition(colors.starsBack.from, colors.starsBack.to, tStartChangeColor, tEndChangeColor)
-  } else {
+  } else if(timeSong <= tStartChangeColor3) {
+    // 2n transition (white - blue)
     colors.background.color = colorTransition(colors.background.to, colors.background.to2, tStartChangeColor2, tEndChangeColor2)
     colors.starsFront.color = colorTransition(colors.starsFront.to, colors.starsFront.to2, tStartChangeColor2, tEndChangeColor2)
     colors.starsBack.color = colorTransition(colors.starsBack.to, colors.starsBack.to2, tStartChangeColor2, tEndChangeColor2)
+  } else if(timeSong <= tStartChangeColor4) {
+    // 3rd transition (black - white)
+    colors.background.color = colorTransition(colors.background.to2, colors.background.to, tStartChangeColor3, tEndChangeColor3)
+    colors.starsFront.color = colorTransition(colors.starsFront.to2, colors.starsFront.to, tStartChangeColor3, tEndChangeColor3)
+    colors.starsBack.color = colorTransition(colors.starsBack.to2, colors.starsBack.to, tStartChangeColor3, tEndChangeColor3)
+  } else {
+    colors.background.color = colorTransition(colors.background.to, colors.background.from, tStartChangeColor4, tEndChangeColor4)
+    colors.starsFront.color = colorTransition(colors.starsFront.to, colors.starsFront.from, tStartChangeColor4, tEndChangeColor4)
+    colors.starsBack.color = colorTransition(colors.starsBack.to, colors.starsBack.from, tStartChangeColor4, tEndChangeColor4)
+
   }
 }
 
@@ -561,8 +656,11 @@ function updateSpeedsKeyPressed() {
 
 function updateShape(){
   let shape = 0
-  if(timeSong >= tChangeShape){
+  if(timeSong >= tChangeShape && timeSong <= tChangeShape2 ){
     shape = 1  
+  } else if(timeSong >= tChangeShape2 ){
+    shape = 0  
+
   }
 
   starsShape = shape
@@ -580,7 +678,9 @@ function updateLyrics() {
 }
 
 function updateSecondaryLyrics() {
-  if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics) {
+  if (timeSong >= tStartSecondaryLyrics && timeSong <= tEndSecondaryLyrics ||
+    timeSong >= tStartSecondaryLyrics2 && timeSong <= tEndSecondaryLyrics2
+    ) {
     for (i in secondaryLyrics.content) {
       const lyric = secondaryLyrics.content[i]
       const start = lyric.tStart
@@ -596,6 +696,13 @@ function updateSecondaryLyrics() {
 }
 
 function updateTremoloSize() {
+  const maxSizeoscillator = 6
+
+  if(timeSong <= tClimaxTremolo)
+  sizeoscillator = speedTransition(0,maxSizeoscillator, tStartTremolo, tClimaxTremolo)
+  else 
+  sizeoscillator = speedTransition(maxSizeoscillator,0, tClimaxTremolo, tEndTremolo)
+
   shouldTremolo = isAnyOfThisIntervals(tremolo.tStart)
   if (shouldTremolo) {
     const start = shouldTremolo
