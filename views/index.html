@@ -18,23 +18,21 @@
 
     }
 
-    .player {
-      position: absolute;
-      bottom: 1rem;
-      width: 100%;
-
-    }
+ 
 
     .timeControl {
+      width: 100%;
       position: absolute;
       bottom: 0;
       padding: 1rem;
+      display: flex;
 
 
     }
 
+
     .timeControl>input {
-      width: 50px;
+      width: 80%;
     }
   </style>
 </head>
@@ -42,16 +40,12 @@
 <body>
 
 
-  <!-- <audio class="player" controls>
-    <source src="music/hello.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio> -->
 
   <img id="asteroid" src="sprites/asteroid.png" style="display:none" />
 
   <div class="timeControl">
-    <input id="travelTo" placeholder="1000" />
-    <button onclick="travelTo( travelTo.value || 1000)">Go</button>
+    <input id="numbersInput" placeholder="E.g. 1223 3123 3145 1231" />
+    <button onclick="lyrics.t = numbersInput.value.split(' ').filter((v,i,a)=>v!=='')">Go</button>
 
   </div>
 

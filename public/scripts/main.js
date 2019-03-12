@@ -41,8 +41,6 @@ const tFinal = 303000
 
 
 
-
-
 let sizePoingOscillation = 0
 
 let tremolo = {
@@ -55,6 +53,10 @@ let shouldDrawQuieroVolar = false
 const onKeyDown = (e) => {
   // console.log(e)
   switch (e.code) {
+    case 'Digit0':
+      travelTo(0)
+      iLyrics.reset()
+      break;
     case 'Digit1':
       travelTo(tStartChangeColor)
       break;
@@ -80,6 +82,7 @@ const onKeyDown = (e) => {
       travelTo(tTornado - 1000)
       break;
     case 'Space':
+    numbersInput.value = numbersInput.value + ' ' + timeSong.toFixed(0)
       iLyrics.nextWord()
       lyrics.isFadingOut = true
       lyrics.color.alpha = 1
@@ -96,6 +99,12 @@ const onKeyDown = (e) => {
     case 'KeyT':
       console.log(timeSong)
       break;
+    case 'KeyD':
+    debug.toggle()
+    break;
+    case 'KeyL':
+    lyrics.test = !lyrics.test 
+    break;
     case 'KeyQ':
       // sizeFrontMax += 3
       sizeoscillator += 0.5
@@ -293,9 +302,12 @@ var colors = {
 }
 
 const lyrics = {
+  test: false,
   isFadingOut: false,
   color: colors.lyrics0,
   position: { x: 0, y: 0, noise: 5 },
+  t: [
+    22566, 27138, 27376, 27681, 29130, 29623, 30117, 30645 ]
 }
 
 const secondaryLyrics = {
@@ -436,6 +448,7 @@ function travelTo(toTime_ms) {
   const toTime = toTime_ms / 1000
   music.currentTime = toTime
   startTime = timeNow - toTime_ms
+  timeSong = toTime_ms
 }
 
 function drawLyrics() {
@@ -667,6 +680,17 @@ function updateShape(){
 }
 
 function updateLyrics() {
+
+
+  if(lyrics.test && timeSong >= lyrics.t[0]){
+    lyrics.t.shift()
+    iLyrics.nextWord()
+    lyrics.isFadingOut = true
+    lyrics.color.alpha = 1
+
+  }
+
+
   if (lyrics.isFadingOut) {
     lyrics.color.alpha -= 0.01
     if (lyrics.color.alpha <= 0) lyrics.isFadingOut = false

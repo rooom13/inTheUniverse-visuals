@@ -1,7 +1,7 @@
 class DebugWindow {
     constructor(c) {
         this.ctx = c
-        this.show = false
+        this.show = true
         this.pairs = []
 
     }
@@ -36,6 +36,7 @@ oscillatorySpeedY:
 lyrics.noise:
 lyrics.isFadingOut:
 sizeoscilatpor:
+lyrics.test:
 `
         const value =
 `${dt.toFixed(2)}
@@ -53,6 +54,7 @@ ${speeds.oscillatorySpeedY.speed.toFixed(2)}
 ${lyrics.position.noise}
 ${lyrics.isFadingOut}
 ${sizeoscillator}
+${lyrics.test}
 `
         const lines = what.split('\n');
         const lines2 = value.split('\n');
