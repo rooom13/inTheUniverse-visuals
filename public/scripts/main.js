@@ -8,17 +8,13 @@ const SHOWCIRCLES = 1
 
 let starsShape = 0
 
+//Objects
 var starsFront = [];
 var starsBack = [];
 var starsFarBack = [];
 
 let iLyrics;
 let times = new Times()
-
-
-
-
-
 
 let sizePoingOscillation = 0
 
@@ -28,206 +24,6 @@ let tremolo = {
 }
 
 let shouldDrawQuieroVolar = false
-const onKeyDown = (e) => {
-  // console.log(e)
-  switch (e.code) {
-    case 'Digit0':
-      travelTo(0)
-      iLyrics.reset()
-      break;
-    case 'Digit1':
-      travelTo(times.tStartChangeColor)
-      break;
-    case 'Digit2':
-      travelTo(times.ternaryLyrics.tStart[0] - 500)
-      break;
-    case 'Digit3':
-      travelTo(times.tStartChangeColor2 - 500)
-      break;
-    case 'Digit4':
-      travelTo(times.tPlatillos - 1000)
-      break;
-    case 'Digit5':
-      travelTo(times.tToLeftSpeed - 1000)
-      break;
-    case 'Digit6':
-      travelTo(times.tStartTremolo - 1000)
-      break;
-    case 'Digit7':
-      travelTo(times.tEndTremolo - 1000)
-      break;
-    case 'Digit8':
-      travelTo(times.tTornado - 1000)
-      break;
-    case 'Space':
-      numbersInput.value = numbersInput.value + ' ' + timeSong.toFixed(0)
-      iLyrics.nextWord()
-      lyrics.isFadingOut = true
-      lyrics.color.alpha = 1
-      break;
-    case 'KeyB':
-      farBackStars = !farBackStars
-      break;
-    case 'KeyM':
-      lyrics.position.noise -= 0.5
-      break;
-    case 'KeyN':
-      lyrics.position.noise += 0.5
-      break;
-    case 'KeyT':
-      console.log(timeSong)
-      break;
-    case 'KeyD':
-      debug.toggle()
-      break;
-    case 'KeyL':
-      lyrics.test = !lyrics.test
-      break;
-    case 'KeyQ':
-      // sizeFrontMax += 3
-      sizeoscillator += 0.5
-      break;
-    case 'KeyA':
-      sizeoscillator -= 0.5
-      // sizeFrontMax-=3
-      break;
-    case 'KeyS':
-      start()
-      break;
-    case 'KeyC':
-      starsShape = (starsShape + 1) % 2
-      break
-    case 'KeyP':
-      travelTo(timeSong + 3000)
-      break
-    case 'KeyO':
-      travelTo(timeSong - 3000)
-      break
-    case 'KeyR':
-      speeds.saved = {
-        start: timeSong,
-        end: timeSong + 2000,
-        vertical: speeds.vertical.speed,
-        horizontal: speeds.horizontal.speed,
-        radius: speeds.radius.speed,
-        angular: speeds.angular.speed,
-        oscillatorySpeedX: speeds.oscillatorySpeedX.speed,
-        oscillatorySpeedY: speeds.oscillatorySpeedY.speed
-      }
-      speeds.reset = true
-      break
-  }
-}
-
-
-function start() {
-  if (music.paused) {
-    if (music.currentTime == 0) {
-      music.currentTime += 0.096
-    }
-    startTime = performance.now() - (timeSong || 0)
-    music.play().then(songStarted = true);
-    music.playbackRate = 1;
-  }
-  else {
-    music.pause()
-    songStarted = false
-  }
-}
-
-function init() {
-  N = 50
-  timePrev = 0
-  music = new Audio('music/hello.mp3');
-  initCanvas()
-  debug = new DebugWindow(ctx)
-  initStars()
-  iLyrics = new InteractiveLyrics()
-  window.requestAnimationFrame(() => { update(); render() })
-}
-
-// INITATORS
-function initCanvas() {
-  canvas = document.querySelector("canvas");
-  canvas.width = document.body.clientWidth;
-  canvas.height = document.body.clientHeight;
-  canvas.addEventListener('click', start)
-  ctx = canvas.getContext("2d");
-}
-
-function initStars() {
-  for (var i = 0; i < N; ++i) {
-    starsFront.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      z: 0.5 + Math.random() * 2,
-    });
-  }
-  for (var i = 0; i < N; ++i) {
-    starsBack.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      z: 4 + Math.random() * 1
-    });
-  }
-  for (var i = 0; i < 8000; ++i) {
-    starsFarBack.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      z: 80 + Math.random() * 1
-    });
-  }
-}
-
-
-
-// UPDATORS
-function updateStarsFront(dt) {
-  for (star in starsFront) {
-    var star = starsFront[star];
-
-    const constantHorizontalSpeed = speeds.horizontal.speed / star.z
-    const constantVerticalSpeed = speeds.vertical.speed / star.z
-
-    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
-    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
-
-    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
-    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
-
-    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
-    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
-  }
-}
-
-function updateStarsBack(dt) {
-  for (star in starsBack) {
-    var star = starsBack[star];
-
-    const constantHorizontalSpeed = speeds.horizontal.speed / star.z
-    const constantVerticalSpeed = speeds.vertical.speed / star.z
-
-    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
-    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
-
-    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
-    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
-
-    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
-    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
-  }
-}
-
-function updateStarsFarBack(dt) {
-  for (star in starsFarBack) {
-    var star = starsFarBack[star];
-    const starSpeed = speeds.vertical.to / star.z
-
-    star.y += starSpeed * 10 * dt
-    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
-    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
-  }
-}
 
 let sizeFrontMax = 18
 let sizeBackMax = 84
@@ -236,6 +32,19 @@ const cvw = document.body.clientWidth
 const cvh = document.body.clientHeight
 
 let sizeoscillator = 0
+function saveSpeeds(){
+  speeds.saved = {
+    start: timeSong,
+    end: timeSong + 2000,
+    vertical: speeds.vertical.speed,
+    horizontal: speeds.horizontal.speed,
+    radius: speeds.radius.speed,
+    angular: speeds.angular.speed,
+    oscillatorySpeedX: speeds.oscillatorySpeedX.speed,
+    oscillatorySpeedY: speeds.oscillatorySpeedY.speed
+  }
+}
+
 
 var colors = {
   background: {
@@ -348,13 +157,8 @@ const ternaryLyrics = {
   tStart: times.tTernaryLyrics
 }
 
-var keyPressedMap = {}; // You could also use an array
-document.addEventListener("keydown", onKeyDown);
-onkeydown = onkeyup = function (e) {
-  e = e || event; // to deal with IE
-  keyPressedMap[e.keyCode] = e.type == 'keydown';
-  /* insert conditional here */
-}
+var keyPressedMap = {};
+
 
 var speeds = {
   keys: {
@@ -402,6 +206,119 @@ var speeds = {
   },
   reset: false
 }
+
+
+function start() {
+  if (music.paused) {
+    if (music.currentTime == 0) {
+      music.currentTime += 0.096
+    }
+    startTime = performance.now() - (timeSong || 0)
+    music.play().then(songStarted = true);
+    music.playbackRate = 1;
+  }
+  else {
+    music.pause()
+    songStarted = false
+  }
+}
+
+function init() {
+  N = 50
+  timePrev = 0
+  music = new Audio('music/hello.mp3');
+  initCanvas()
+  debug = new DebugWindow(ctx)
+  initStars()
+  iLyrics = new InteractiveLyrics()
+  window.requestAnimationFrame(() => { update(); render() })
+}
+
+// INITATORS
+function initCanvas() {
+  canvas = document.querySelector("canvas");
+  canvas.width = cvw;
+  canvas.height = cvh;
+  canvas.addEventListener('click', start)
+  ctx = canvas.getContext("2d");
+}
+
+function initStars() {
+  for (var i = 0; i < N; ++i) {
+    starsFront.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      z: 0.5 + Math.random() * 2,
+    });
+  }
+  for (var i = 0; i < N; ++i) {
+    starsBack.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      z: 4 + Math.random() * 1
+    });
+  }
+  for (var i = 0; i < 8000; ++i) {
+    starsFarBack.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      z: 80 + Math.random() * 1
+    });
+  }
+}
+
+
+
+// UPDATORS
+function updateStarsFront(dt) {
+  for (star in starsFront) {
+    var star = starsFront[star];
+
+    const constantHorizontalSpeed = speeds.horizontal.speed / star.z
+    const constantVerticalSpeed = speeds.vertical.speed / star.z
+
+    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+
+    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
+    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
+
+    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+  }
+}
+
+function updateStarsBack(dt) {
+  for (star in starsBack) {
+    var star = starsBack[star];
+
+    const constantHorizontalSpeed = speeds.horizontal.speed / star.z
+    const constantVerticalSpeed = speeds.vertical.speed / star.z
+
+    speeds.oscillatorySpeedX.speed = speeds.radius.speed * Math.cos(speeds.angular.speed * timeNow / 1000)
+    speeds.oscillatorySpeedY.speed = speeds.radius.speed * Math.sin(speeds.angular.speed * timeNow / 1000)
+
+    star.x += constantHorizontalSpeed * dt + speeds.oscillatorySpeedX.speed
+    star.y += constantVerticalSpeed * dt + speeds.oscillatorySpeedY.speed
+
+    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+  }
+}
+
+function updateStarsFarBack(dt) {
+  for (star in starsFarBack) {
+    var star = starsFarBack[star];
+    const starSpeed = speeds.vertical.to / star.z
+
+    star.y += starSpeed * 10 * dt
+    if (star.y > canvas.height) { star.y = star.y % canvas.height } else if (star.y < 0) { star.y = canvas.height + (star.y % canvas.height) }
+    if (star.x > canvas.width) { star.x = star.x % canvas.width } else if (star.x < 0) { star.x = canvas.width + (star.x % canvas.width) }
+  }
+}
+
+
+
 
 function travelTo(toTime_ms) {
   const toTime = toTime_ms / 1000
@@ -633,14 +550,18 @@ function updateShape() {
   starsShape = shape
 }
 
+function triggerNextLyric() {
+  iLyrics.nextWord()
+  lyrics.isFadingOut = true
+  lyrics.color.alpha = 1
+}
+
 function updateLyrics() {
 
 
   if (lyrics.test && timeSong >= lyrics.t[0]) {
     lyrics.t.shift()
-    iLyrics.nextWord()
-    lyrics.isFadingOut = true
-    lyrics.color.alpha = 1
+    triggerNextLyric()
 
   }
 
