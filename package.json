@@ -1,7 +1,7 @@
 {
-  "name": "cloud-computing-exercise-app",
+  "name": "in-the-universe-Visuals",
   "version": "1.0.0",
-  "description": "Build an app for library portal",
+  "description": "Videoclip for In the Universe. The main objective was to build an interactive lyrics animation to ease lyrics & audio synchornization",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,7 +10,7 @@
     "type": "git",
     "url": ""
   },
-  "author": "Anshul Jindal",
+  "author": "Romśn Rey",
   "license": "ISC",
   "bugs": {
     "url": ""
@@ -18,7 +18,6 @@
   "homepage": "",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.4",
-    "mongoose": "^5.3.4"
+    "express": "^4.16.4"
   }
 }

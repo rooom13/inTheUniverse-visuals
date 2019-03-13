@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 
-
-
-  <title>Hola</title>
-
+  <title>In The Universe</title>
 
   <style>
     html,
@@ -15,23 +12,17 @@
       margin: 0;
       width: 100%;
       height: 100%;
-
     }
 
- 
-
-    .timeControl {
+    .lyricsManager {
       width: 100%;
       position: absolute;
       bottom: 0;
       padding: 1rem;
       display: flex;
-
-
     }
 
-
-    .timeControl>input {
+    .lyricsManager>input {
       width: 80%;
     }
   </style>
@@ -39,28 +30,20 @@
 
 <body>
 
-
-
-  <img id="asteroid" src="sprites/asteroid.png" style="display:none" />
-
-  <div class="timeControl">
+  <div class="lyricsManager">
     <input id="numbersInput" placeholder="E.g. 1223 3123 3145 1231" />
     <button onclick="lyrics.t = numbersInput.value.split(' ').filter((v,i,a)=>v!=='')">Go</button>
-
   </div>
 
   <canvas id="myCanvas"></canvas>
+
+  <script src="scripts/Color.js"></script>
+  <script src="scripts/Debug.js"></script>
+  <script src="scripts/ILyrics.js"></script>
   
-  <script src="scripts/Color.js" ></script>
-  <script src="scripts/Debug.js" ></script>
-  <script src="scripts/ILyrics.js" ></script>
-
-  <script src="scripts/main.js" ></script>
-
-
-
-
-
+  
+  <script src="scripts/times.js"></script>
+  <script src="scripts/main.js"></script>
 </body>
 
 </html>
