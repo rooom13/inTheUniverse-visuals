@@ -47,29 +47,8 @@ function saveSpeeds() {
 }
 
 
-var colors = {
-  background: {
-    color: new Color(0, 0, 0),
-    from: new Color(0, 0, 0),
-    to: new Color(255, 255, 255),
-    to2: new Color(0, 2, 53)
-  },
-  starsFront: {
-    color: new Color(255, 255, 255),
-    from: new Color(255, 255, 255),
-    to: new Color(0, 0, 0),
-    to2: new Color(255, 240, 197)
-
-  },
-  starsBack: {
-    color: new Color(220, 220, 220),
-    from: new Color(220, 220, 220),
-    to: new Color(35, 35, 35),
-    to2: new Color(251, 231, 173)
-  },
-  lyrics0: new Color(255, 255, 0),
-  lyric1: new Color(255, 255, 0)
-}
+let colors =  Values.colors()
+let speeds = Values.speeds()
 
 const lyrics = {
   test: false,
@@ -161,52 +140,7 @@ const ternaryLyrics = {
 var keyPressedMap = {};
 
 
-var speeds = {
-  keys: {
-    radius: 0,
-    angular: 0,
-    vertical: 0,
-    horizontal: 0,
-  },
-  vertical: {
-    speed: - 0.01,
-    from: - 2.8,
-    to: - 0.01
-  },
-  horizontal: {
-    speed: 0,
-    from: 0,
-    increment: 0.25
 
-  },
-  radius: {
-    speed: 0,
-    from: 0,
-    to: -4.15
-  },
-  angular: {
-    speed: 0,
-    from: 0,
-    to: 1.75
-  },
-  oscillatorySpeedX: {
-    speed: 10
-  },
-  oscillatorySpeedY: {
-    speed: 0
-  },
-  saved: {
-    start: null,
-    end: null,
-    vertical: null,
-    horizontal: null,
-    radius: null,
-    angular: null,
-    oscillatorySpeedX: null,
-    oscillatorySpeedY: null
-  },
-  reset: false
-}
 
 
 
@@ -215,7 +149,6 @@ function init() {
   N = 50
   timePrev = 0
   player = new Player('music/hello.mp3')
-  //music = new Audio('music/hello.mp3');
   initCanvas()
   debug = new DebugWindow(ctx)
   initStars()
@@ -417,17 +350,17 @@ function updateResetAllSpeedsTransition() {
   const start = speeds.saved.start
   const end = start + 5000
 
-  speeds.keys.vertical = speedTransition(speeds.saved.vertical, 0, start, end)
-  speeds.keys.horizontal = speedTransition(speeds.saved.horizontal, 0, start, end)
-  speeds.keys.radius = speedTransition(speeds.saved.radius, 0, start, end)
-  speeds.keys.angular = speedTransition(speeds.saved.angular, 0, start, end)
-  speeds.keys.oscillatorySpeedX = speedTransition(speeds.saved.oscillatorySpeedX, 0, start, end)
-  speeds.keys.oscillatorySpeedY = speedTransition(speeds.saved.oscillatorySpeedY, 0, start, end)
+  speeds.keys.vertical = transition(speeds.saved.vertical, 0, start, end)
+  speeds.keys.horizontal = transition(speeds.saved.horizontal, 0, start, end)
+  speeds.keys.radius = transition(speeds.saved.radius, 0, start, end)
+  speeds.keys.angular = transition(speeds.saved.angular, 0, start, end)
+  speeds.keys.oscillatorySpeedX = transition(speeds.saved.oscillatorySpeedX, 0, start, end)
+  speeds.keys.oscillatorySpeedY = transition(speeds.saved.oscillatorySpeedY, 0, start, end)
 
   if (player.timeSong > end) speeds.reset = false
 }
 
-function speedTransition(from, to, start, end) {
+function transition(from, to, start, end) {
   const acceleration = (to - from) / (end - start)
   return from + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
 }
@@ -437,39 +370,45 @@ function colorTransition(from, to, start, end) {
   return from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
 }
 
+function updateHorizontalSpeed() {
+  const toLeft1 = transition(0, speeds.horizontal.increment, times.tToLeftSpeed, times.tToLeftSpeed + 3000)
+  const toLeft2 = transition(0, speeds.horizontal.increment, times.tToLeftSpeed2, times.tToLeftSpeed2 + 3000)
+  const toLeft3 = transition(0, speeds.horizontal.increment, times.tToLeftSpeed3, times.tToLeftSpeed3 + 3000)
+  const toLeft4 = transition(0, speeds.horizontal.increment, times.tToLeftSpeed4, times.tToLeftSpeed4 + 3000)
+  const resetToLeft = transition(0, -4 * speeds.horizontal.increment, times.tToDown, times.tToLeftSpeedEnd)
+  const leftTransition1 = toLeft1 + toLeft2 + toLeft3 + toLeft4 + resetToLeft
+
+  // FINAL
+  const toLeftFinal = transition(0, 3, times.tTornado, times.tToLeftSpeedFinalEnd)
+  const resetToLeftFinal = transition(0, -3, times.tToLeftSpeedFinalEnd, times.tFinal)
+  const leftTransition2 = toLeftFinal + resetToLeftFinal
+  speeds.horizontal.speed = speeds.keys.horizontal + leftTransition1 + leftTransition2
+}
+
+function updateVerticalSpeed() {
+  const introSpeed = transition(speeds.vertical.from, speeds.vertical.to, 0, times.tEndIntro)
+  const goDown = transition(0, +0.02, times.tToDown, times.tToLeftSpeedEnd)
+  const goUp = transition(0, -3, times.tToLeftSpeedFinalEnd, times.tFinal + 1000)
+  speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown + goUp
+}
+
+function updateOscillatorySpeeds(){
+  speeds.angular.speed = speeds.keys.angular + transition(speeds.angular.from, speeds.angular.to, times.tEndTremolo, times.tEndTremolo + 10000)
+  speeds.radius.speed = speeds.keys.radius + transition(speeds.radius.from, speeds.radius.to, times.tEndTremolo, times.tEndTremolo + 20000)
+
+  speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
+  speeds.oscillatorySpeedY.speed = speeds.keys.oscillatorySpeedX
+}
+
 function updateSpeeds() {
 
   updateSpeedsKeyPressed()
   if (speeds.reset) updateResetAllSpeedsTransition()
 
-  //vertical
+  updateVerticalSpeed()
+  updateHorizontalSpeed()
+  updateOscillatorySpeeds()
 
-
-  const introSpeed = speedTransition(speeds.vertical.from, speeds.vertical.to, 0, times.tEndIntro)
-  const goDown = speedTransition(0, +0.02, times.tToDown, times.tToLeftSpeedEnd)
-
-  const goUp = speedTransition(0, -3, times.tToLeftSpeedFinalEnd, times.tFinal + 1000)
-
-  speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown + goUp
-
-  const toLeft1 = speedTransition(0, speeds.horizontal.increment, times.tToLeftSpeed, times.tToLeftSpeed + 3000)
-  const toLeft2 = speedTransition(0, speeds.horizontal.increment, times.tToLeftSpeed2, times.tToLeftSpeed2 + 3000)
-  const toLeft3 = speedTransition(0, speeds.horizontal.increment, times.tToLeftSpeed3, times.tToLeftSpeed3 + 3000)
-  const toLeft4 = speedTransition(0, speeds.horizontal.increment, times.tToLeftSpeed4, times.tToLeftSpeed4 + 3000)
-  const resetToLeft = speedTransition(0, -4 * speeds.horizontal.increment, times.tToDown, times.tToLeftSpeedEnd)
-  const leftTransition1 = toLeft1 + toLeft2 + toLeft3 + toLeft4 + resetToLeft
-
-  // FINAL
-  const toLeftFinal = speedTransition(0, 3, times.tTornado, times.tToLeftSpeedFinalEnd)
-  const resetToLeftFinal = speedTransition(0, -3, times.tToLeftSpeedFinalEnd, times.tFinal)
-  const leftTransition2 = toLeftFinal + resetToLeftFinal
-  speeds.horizontal.speed = speeds.keys.horizontal + leftTransition1 + leftTransition2
-
-  speeds.angular.speed = speeds.keys.angular + speedTransition(speeds.angular.from, speeds.angular.to, times.tEndTremolo, times.tEndTremolo + 10000)
-  speeds.radius.speed = speeds.keys.radius + speedTransition(speeds.radius.from, speeds.radius.to, times.tEndTremolo, times.tEndTremolo + 20000)
-
-  speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
-  speeds.oscillatorySpeedY.speed = speeds.keys.oscillatorySpeedX
 }
 function updateColors() {
 
@@ -492,14 +431,11 @@ function updateColors() {
     colors.background.color = colorTransition(colors.background.to, colors.background.from, times.tStartChangeColor4, times.tEndChangeColor4)
     colors.starsFront.color = colorTransition(colors.starsFront.to, colors.starsFront.from, times.tStartChangeColor4, times.tEndChangeColor4)
     colors.starsBack.color = colorTransition(colors.starsBack.to, colors.starsBack.from, times.tStartChangeColor4, times.tEndChangeColor4)
-
   }
 }
 
 function updateSpeedsKeyPressed() {
   const ctrlPressed = keyPressedMap[17] || false
-  const leftAltPressed = keyPressedMap[18] || false
-  const spacePressed = keyPressedMap[32] || false
   const leftPressed = keyPressedMap[37] || false
   const upPressed = keyPressedMap[38] || false
   const rightPressed = keyPressedMap[39] || false
@@ -523,9 +459,7 @@ function updateShape() {
     shape = 1
   } else if (player.timeSong >= times.tChangeShape2) {
     shape = 0
-
   }
-
   starsShape = shape
 }
 
@@ -536,14 +470,10 @@ function triggerNextLyric() {
 }
 
 function updateLyrics() {
-
-
   if (lyrics.test && player.timeSong >= lyrics.t[0]) {
     lyrics.t.shift()
     triggerNextLyric()
-
   }
-
 
   if (lyrics.isFadingOut) {
     lyrics.color.alpha -= 0.01
@@ -551,8 +481,6 @@ function updateLyrics() {
   }
   lyrics.position.x = canvas.width / 2 + Math.cos(timeNow / 1000) * 20
   lyrics.position.y = canvas.height / 2 + Math.sin(timeNow / 1000) * 10
-
-  if (player.timeSong >= times.tEndChangeColor) lyrics.Color = new Color
 }
 
 function updateSecondaryLyrics() {
@@ -562,12 +490,10 @@ function updateSecondaryLyrics() {
     for (i in secondaryLyrics.content) {
       const lyric = secondaryLyrics.content[i]
       const start = lyric.tStart
-      const end = start + 3000
+      const end = start + 2500
       if (player.timeSong >= start) {
-        // I'm not refactoring this
-        lyric.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
-        const acceleration = (0 - 1) / (end - start)
-        lyric.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
+        lyric.position.y = transition(cvh, cvh-500, start, end)
+        lyric.alpha = transition(1, 0, start, end)
       }
     }
   }
@@ -577,18 +503,16 @@ function updateTremoloSize() {
   const maxSizeoscillator = 6
 
   if (player.timeSong <= times.tClimaxTremolo)
-    sizeoscillator = speedTransition(0, maxSizeoscillator, times.tStartTremolo, times.tClimaxTremolo)
+    sizeoscillator = transition(0, maxSizeoscillator, times.tStartTremolo, times.tClimaxTremolo)
   else
-    sizeoscillator = speedTransition(maxSizeoscillator, 0, times.tClimaxTremolo, times.tEndTremolo)
+    sizeoscillator = transition(maxSizeoscillator, 0, times.tClimaxTremolo, times.tEndTremolo)
 
   shouldTremolo = isAnyOfThisIntervals(tremolo.tStart)
   if (shouldTremolo) {
     const start = shouldTremolo
     const end = start + 1600
     if (player.timeSong >= start) {
-      // I'm not refactoring this
-      const acceleration = (0 - 3) / (end - start)
-      tremolo.size = 3 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
+      tremolo.size = transition(3, 0, start, end)
     }
   }
 }
@@ -605,11 +529,8 @@ function updateTernaryLyrics() {
     const start = shouldDrawQuieroVolar
     const end = start + 1500
     if (player.timeSong >= start) {
-      // I'm not refactoring this
-      // ternaryLyrics.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
-      const acceleration = (0 - 1) / (end - start)
-      ternaryLyrics.position.y = cvh + (-0.05 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
-      ternaryLyrics.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
+      ternaryLyrics.position.y = transition(cvh, cvh-200, start,end)
+      ternaryLyrics.alpha = transition(1,0,start, end) 
     }
   }
 }
@@ -622,8 +543,8 @@ function update() {
   timePrev = timeNow
 
   player.update(timeNow)
-  
-  if(player.started){
+
+  if (player.started) {
     updateSpeeds()
     updateColors()
   }
