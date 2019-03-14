@@ -620,10 +620,10 @@ function update() {
   timeNow = performance.now()
   dt = timeNow - timePrev
   timePrev = timeNow
-  
+
   player.update(timeNow)
   
-  if(player._songStarted){
+  if(player.started){
     updateSpeeds()
     updateColors()
   }

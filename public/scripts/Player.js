@@ -3,7 +3,7 @@ class Player {
         this._music = new Audio(src)
         this._music.playbackRate = 1
 
-        this._songStarted = false
+        this.started = false
         this.paused = true
         this.timeSong = 0
     }
@@ -21,12 +21,12 @@ class Player {
             if (this._music.currentTime == 0) {
             }
             this._music.play().then(() => {
-                this._songStarted = true
+                this.started = true
             });
         }
         else {
             this._music.pause()
-            this._songStarted = false
+            this.started = false
         }
     }
 }
