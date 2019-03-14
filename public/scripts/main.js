@@ -1,144 +1,45 @@
-var debug
-var N, speed0, speed1, speed, startTime, timePrev, timeNow, dt, canvas, ctx
-var songStarted = false
-let farBackStars = !true
+const cvw = document.body.clientWidth
+const cvh = document.body.clientHeight
+
+let N, timePrev, timeNow, dt, canvas, ctx
+
+
+
+//Objects
+
+let stars = Values.stars()
+
 
 const SHOWSQUARES = 0
 const SHOWCIRCLES = 1
-
 let starsShape = 0
 
-//Objects
-var starsFront = [];
-var starsBack = [];
-var starsFarBack = [];
 
-let iLyrics;
+
+
 let player;
+let debug
 let times = new Times()
 
-let sizePoingOscillation = 0
 
 let tremolo = {
   size: 0,
   tStart: times.tTremolos
 }
 
-let shouldDrawQuieroVolar = false
-
-let sizeFrontMax = 18
-let sizeBackMax = 84
-
-const cvw = document.body.clientWidth
-const cvh = document.body.clientHeight
-
-let sizeoscillator = 0
-function saveSpeeds() {
-  speeds.saved = {
-    start: player.timeSong,
-    end: player.timeSong + 2000,
-    vertical: speeds.vertical.speed,
-    horizontal: speeds.horizontal.speed,
-    radius: speeds.radius.speed,
-    angular: speeds.angular.speed,
-    oscillatorySpeedX: speeds.oscillatorySpeedX.speed,
-    oscillatorySpeedY: speeds.oscillatorySpeedY.speed
-  }
-}
 
 
-let colors =  Values.colors()
+// Values
+let colors = Values.colors()
 let speeds = Values.speeds()
+let sizes = Values.sizes()
 
-const lyrics = {
-  test: false,
-  isFadingOut: false,
-  color: colors.lyrics0,
-  position: { x: 0, y: 0, noise: 5 },
-  t: []
-}
+// Lyrics
+const lyrics = Values.primaryLyrics()
+const secondaryLyrics = Values.secondaryLyrics()
+const ternaryLyrics = Values.ternaryLyrics()
 
-const secondaryLyrics = {
-  speed: -3,
-  content: [
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics,
-      position: { x: cvw / 5, y: cvh }
-    },
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics_2,
-      position: { x: cvw / 2, y: cvh }
-    },
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics_3,
-      position: { x: 4 * cvw / 5, y: cvh }
-    },
-    {
-      text: 'Al universo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics_4,
-      position: { x: cvw / 2, y: cvh }
-
-    },
-    {
-      text: 'ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics_5,
-      position: { x: cvw / 2, y: cvh }
-
-    },
-    // ROUND 2
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics2,
-      position: { x: cvw / 5, y: cvh }
-    },
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics2_2,
-      position: { x: cvw / 2, y: cvh }
-    },
-    {
-      text: 'Ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics2_3,
-      position: { x: 4 * cvw / 5, y: cvh }
-    },
-    {
-      text: 'Al universo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics2_4,
-      position: { x: cvw / 2, y: cvh }
-
-    },
-    {
-      text: 'ven conmigo',
-      alpha: 1,
-      tStart: times.tStartSecondaryLyrics2_5,
-      position: { x: cvw / 2, y: cvh }
-
-    },
-
-  ]
-}
-
-const ternaryLyrics = {
-  text: 'Quiero volar',
-  alpha: 1,
-  position: { x: null, y: cvh / 2 },
-  tStart: times.tTernaryLyrics
-}
-
-var keyPressedMap = {};
-
+let keyPressedMap = {}
 
 
 
@@ -152,7 +53,6 @@ function init() {
   initCanvas()
   debug = new DebugWindow(ctx)
   initStars()
-  iLyrics = new InteractiveLyrics()
   window.requestAnimationFrame(() => { update(); render() })
 }
 
@@ -166,21 +66,21 @@ function initCanvas() {
 
 function initStars() {
   for (var i = 0; i < N; ++i) {
-    starsFront.push({
+    stars.front.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       z: 0.5 + Math.random() * 2,
     });
   }
   for (var i = 0; i < N; ++i) {
-    starsBack.push({
+    stars.back.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       z: 4 + Math.random() * 1
     });
   }
   for (var i = 0; i < 8000; ++i) {
-    starsFarBack.push({
+    stars.far.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       z: 80 + Math.random() * 1
@@ -189,11 +89,23 @@ function initStars() {
 }
 
 
+function saveSpeeds() {
+  speeds.saved = {
+    start: player.timeSong,
+    end: player.timeSong + 2000,
+    vertical: speeds.vertical.speed,
+    horizontal: speeds.horizontal.speed,
+    radius: speeds.radius.speed,
+    angular: speeds.angular.speed,
+    oscillatorySpeedX: speeds.oscillatorySpeedX.speed,
+    oscillatorySpeedY: speeds.oscillatorySpeedY.speed
+  }
+}
 
 // UPDATORS
 function updateStarsFront(dt) {
-  for (star in starsFront) {
-    var star = starsFront[star];
+  for (star in stars.front) {
+    var star = stars.front[star];
 
     const constantHorizontalSpeed = speeds.horizontal.speed / star.z
     const constantVerticalSpeed = speeds.vertical.speed / star.z
@@ -210,8 +122,8 @@ function updateStarsFront(dt) {
 }
 
 function updateStarsBack(dt) {
-  for (star in starsBack) {
-    var star = starsBack[star];
+  for (star in stars.back) {
+    var star = stars.back[star];
 
     const constantHorizontalSpeed = speeds.horizontal.speed / star.z
     const constantVerticalSpeed = speeds.vertical.speed / star.z
@@ -228,8 +140,8 @@ function updateStarsBack(dt) {
 }
 
 function updateStarsFarBack(dt) {
-  for (star in starsFarBack) {
-    var star = starsFarBack[star];
+  for (star in stars.far) {
+    var star = stars.far[star];
     const starSpeed = speeds.vertical.to / star.z
 
     star.y += starSpeed * 10 * dt
@@ -244,8 +156,8 @@ function drawLyrics() {
   ctx.font = "70px arial";
   ctx.textAlign = "start"
 
-  const textSize = ctx.measureText(iLyrics.currentVerse).width
-  ctx.fillText(iLyrics.currentTextBuffer, lyrics.position.x - textSize / 2, lyrics.position.y);
+  const textSize = ctx.measureText(lyrics.iLyrics.currentVerse).width
+  ctx.fillText(lyrics.iLyrics.currentTextBuffer, lyrics.position.x - textSize / 2, lyrics.position.y);
 }
 
 function drawSecondaryLyrics() {
@@ -272,7 +184,7 @@ function isAnyOfThisIntervals(intervals) {
 }
 
 function drawTernaryLyrics() {
-  if (shouldDrawQuieroVolar) {
+  if (ternaryLyrics.shouldDraw) {
     ctx.font = "40px arial";
     ctx.textAlign = "center"
     ctx.fillStyle = "rgb(01, 255, 1," + ternaryLyrics.alpha + ")";
@@ -288,9 +200,9 @@ function drawStarsFront(stars) {
 
     const oscillation = Math.cos(player.timeSong / 100 + Math.PI)
 
-    const constantoscillation = sizeoscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
+    const constantoscillation = sizes.oscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
     const poingOscillation = tremolo.size * oscillation
-    const size = sizeFrontMax / star.z + constantoscillation + poingOscillation
+    const size = sizes.frontMax / star.z + constantoscillation + poingOscillation
 
     switch (starsShape) {
       case SHOWSQUARES:
@@ -317,9 +229,9 @@ function drawStarsBack(stars) {
     var star = stars[i];
 
     const oscillation = Math.cos(player.timeSong / 100 + Math.PI)
-    const constantoscillation = sizeoscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
+    const constantoscillation = sizes.oscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
     const poingOscillation = tremolo.size * oscillation
-    const size = sizeBackMax / star.z + constantoscillation + poingOscillation
+    const size = sizes.backMax / star.z + constantoscillation + poingOscillation
 
     switch (starsShape) {
       case SHOWSQUARES:
@@ -392,7 +304,7 @@ function updateVerticalSpeed() {
   speeds.vertical.speed = introSpeed + speeds.keys.vertical + goDown + goUp
 }
 
-function updateOscillatorySpeeds(){
+function updateOscillatorySpeeds() {
   speeds.angular.speed = speeds.keys.angular + transition(speeds.angular.from, speeds.angular.to, times.tEndTremolo, times.tEndTremolo + 10000)
   speeds.radius.speed = speeds.keys.radius + transition(speeds.radius.from, speeds.radius.to, times.tEndTremolo, times.tEndTremolo + 20000)
 
@@ -460,11 +372,11 @@ function updateShape() {
   } else if (player.timeSong >= times.tChangeShape2) {
     shape = 0
   }
-  starsShape = shape
+  stars.shape = shape
 }
 
 function triggerNextLyric() {
-  iLyrics.nextWord()
+  lyrics.iLyrics.nextWord()
   lyrics.isFadingOut = true
   lyrics.color.alpha = 1
 }
@@ -492,7 +404,7 @@ function updateSecondaryLyrics() {
       const start = lyric.tStart
       const end = start + 2500
       if (player.timeSong >= start) {
-        lyric.position.y = transition(cvh, cvh-500, start, end)
+        lyric.position.y = transition(cvh, cvh - 500, start, end)
         lyric.alpha = transition(1, 0, start, end)
       }
     }
@@ -503,9 +415,9 @@ function updateTremoloSize() {
   const maxSizeoscillator = 6
 
   if (player.timeSong <= times.tClimaxTremolo)
-    sizeoscillator = transition(0, maxSizeoscillator, times.tStartTremolo, times.tClimaxTremolo)
+    sizes.oscillator = transition(0, maxSizeoscillator, times.tStartTremolo, times.tClimaxTremolo)
   else
-    sizeoscillator = transition(maxSizeoscillator, 0, times.tClimaxTremolo, times.tEndTremolo)
+    sizes.oscillator = transition(maxSizeoscillator, 0, times.tClimaxTremolo, times.tEndTremolo)
 
   shouldTremolo = isAnyOfThisIntervals(tremolo.tStart)
   if (shouldTremolo) {
@@ -518,19 +430,19 @@ function updateTremoloSize() {
 }
 
 function updateTernaryLyrics() {
-  shouldDrawQuieroVolar = isAnyOfThisIntervals(ternaryLyrics.tStart)
+  ternaryLyrics.shouldDraw = isAnyOfThisIntervals(ternaryLyrics.tStart)
 
   if (ternaryLyrics.position.x == null) {
     ternaryLyrics.position.x = cvw / 3 + Math.random() * cvw * 2 / 3
   }
-  if (!shouldDrawQuieroVolar) ternaryLyrics.position.x = null
+  if (!ternaryLyrics.shouldDraw) ternaryLyrics.position.x = null
 
-  if (shouldDrawQuieroVolar) {
-    const start = shouldDrawQuieroVolar
+  if (ternaryLyrics.shouldDraw) {
+    const start = ternaryLyrics.shouldDraw
     const end = start + 1500
     if (player.timeSong >= start) {
-      ternaryLyrics.position.y = transition(cvh, cvh-200, start,end)
-      ternaryLyrics.alpha = transition(1,0,start, end) 
+      ternaryLyrics.position.y = transition(cvh, cvh - 200, start, end)
+      ternaryLyrics.alpha = transition(1, 0, start, end)
     }
   }
 }
@@ -559,7 +471,7 @@ function update() {
 
 
   // UPDATE STARS
-  if (farBackStars)
+  if (stars.drawFar)
     updateStarsFarBack(dt)
   updateStarsBack(dt)
   updateStarsFront(dt)
@@ -568,10 +480,10 @@ function update() {
 //RENDER
 function render() {
   drawBackground()
-  if (farBackStars) drawStarsFarBack(starsFarBack)
-  drawStarsBack(starsBack)
+  if (stars.drawFar) drawStarsFarBack(stars.far)
+  drawStarsBack(stars.back)
   drawLyrics()
-  drawStarsFront(starsFront)
+  drawStarsFront(stars.front)
   drawSecondaryLyrics()
   drawTernaryLyrics()
   debug.render()

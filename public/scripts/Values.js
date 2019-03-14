@@ -1,6 +1,6 @@
 class Values {
 
-    static colors(){
+    static colors() {
         return {
             background: {
                 color: new Color(0, 0, 0),
@@ -26,7 +26,7 @@ class Values {
         }
     }
 
-    static speeds(){
+    static speeds() {
         return {
             keys: {
                 radius: 0,
@@ -72,6 +72,119 @@ class Values {
                 oscillatorySpeedY: null
             },
             reset: false
+        }
+    }
+    static sizes() {
+        return {
+            frontMax: 18,
+            backMax: 84,
+            oscillator: 0
+
+
+        }
+
+    }
+
+    static secondaryLyrics() {
+        return {
+            speed: -3,
+            content: [
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics,
+                    position: { x: cvw / 5, y: cvh }
+                },
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics_2,
+                    position: { x: cvw / 2, y: cvh }
+                },
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics_3,
+                    position: { x: 4 * cvw / 5, y: cvh }
+                },
+                {
+                    text: 'Al universo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics_4,
+                    position: { x: cvw / 2, y: cvh }
+
+                },
+                {
+                    text: 'ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics_5,
+                    position: { x: cvw / 2, y: cvh }
+
+                },
+                // ROUND 2
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics2,
+                    position: { x: cvw / 5, y: cvh }
+                },
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics2_2,
+                    position: { x: cvw / 2, y: cvh }
+                },
+                {
+                    text: 'Ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics2_3,
+                    position: { x: 4 * cvw / 5, y: cvh }
+                },
+                {
+                    text: 'Al universo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics2_4,
+                    position: { x: cvw / 2, y: cvh }
+
+                },
+                {
+                    text: 'ven conmigo',
+                    alpha: 1,
+                    tStart: times.tStartSecondaryLyrics2_5,
+                    position: { x: cvw / 2, y: cvh }
+                },
+            ]
+        }
+    }
+    static ternaryLyrics() {
+        return {
+            shouldDraw: false,
+            text: 'Quiero volar',
+            alpha: 1,
+            position: { x: null, y: cvh / 2 },
+            tStart: times.tTernaryLyrics
+        }
+    }
+
+    static primaryLyrics() {
+        return {
+            iLyrics : new InteractiveLyrics(),
+            test: false,
+            isFadingOut: false,
+            color: colors.lyrics0,
+            position: { x: 0, y: 0, noise: 5 },
+            t: []
+        }
+
+    }
+
+     static stars() {
+        return {
+            front: [],
+            back: [],
+            far: [],
+            shape: 0,
+            drawFar: false
         }
     }
 }

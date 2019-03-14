@@ -49,7 +49,7 @@ ${speeds.oscillatorySpeedX.speed.toFixed(2)}
 ${speeds.oscillatorySpeedY.speed.toFixed(2)}
 ${lyrics.position.noise}
 ${lyrics.isFadingOut}
-${sizeoscillator}
+${sizes.oscillator}
 ${lyrics.test}
 `
         const lines = what.split('\n');

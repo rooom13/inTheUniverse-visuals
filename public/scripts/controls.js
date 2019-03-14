@@ -34,7 +34,7 @@ const onKeyDown = (e) => {
             triggerNextLyric()
             break;
         case 'KeyB':
-            farBackStars = !farBackStars
+            stars.drawFar = !stars.drawFar
             break;
         case 'KeyM':
             lyrics.position.noise -= 0.5
@@ -52,10 +52,10 @@ const onKeyDown = (e) => {
             lyrics.test = !lyrics.test
             break;
         case 'KeyQ':
-            sizeoscillator += 0.5
+            sizes.oscillator += 0.5
             break;
         case 'KeyA':
-            sizeoscillator -= 0.5
+            sizeos.scillator -= 0.5
             break;
         case 'KeyS':
             player.togglePaused(timeNow)
