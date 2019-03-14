@@ -23,9 +23,7 @@ class DebugWindow {
         const what =
 `dt:
 map :
-music.currentTime : 
 timeSong :
-startTime:
 timeNow:
 horizontalSpeed:
 verticalSpeed:
@@ -41,9 +39,7 @@ lyrics.test:
         const value =
 `${dt.toFixed(2)}
 ${JSON.stringify(keyPressedMap)}
-${music.currentTime.toFixed(2)}
-${(timeSong / 1000 || 0).toFixed(2)}
-${(startTime || 0).toFixed(0)}
+${(player.timeSong / 1000 || 0).toFixed(2)}
 ${timeNow.toFixed(0)}
 ${speeds.horizontal.speed.toFixed(2)}
 ${speeds.vertical.speed.toFixed(2)}

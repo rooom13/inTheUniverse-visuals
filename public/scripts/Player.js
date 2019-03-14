@@ -1,37 +1,32 @@
 class Player {
-    constructor(src){
-        this.music = new Audio('music/hello.mp3');
+    constructor(src) {
+        this._music = new Audio(src)
+        this._music.playbackRate = 1
+
         this._songStarted = false
         this.paused = true
         this.timeSong = 0
-        this.paused.current
     }
 
-    init(){
-
+    goTo(toTime_ms) {
+        this._music.currentTime = toTime_ms / 1000
     }
 
-    set currentTime (toTime_ms){
-        const toTime = toTime_ms / 1000
-        this.music.currentTime = toTime
-        this._starTime = this._timeNow - toTime_ms
-        this.timeSong = toTime_ms
+    update() {
+        this.timeSong = this._music.currentTime * 1000// timeNow - this._startTime
     }
 
-    togglePaused(){
-        if(this.paused){
-            if(this.currentTime == 0){
-                this.currentTime += 0.096
+    togglePaused() {
+        if (this._music.paused) {
+            if (this._music.currentTime == 0) {
             }
-
+            this._music.play().then(() => {
+                this._songStarted = true
+            });
         }
-
+        else {
+            this._music.pause()
+            this._songStarted = false
+        }
     }
-
-
-
-    update(){
-
-    }
-
 }

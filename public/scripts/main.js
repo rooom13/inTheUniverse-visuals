@@ -1,7 +1,7 @@
 var debug
-var N, speed0, speed1, speed, startTime, timePrev, timeNow, timeSong = 0, dt, canvas, ctx
+var N, speed0, speed1, speed, startTime, timePrev, timeNow, dt, canvas, ctx
 var songStarted = false
-let farBackStars = true
+let farBackStars = !true
 
 const SHOWSQUARES = 0
 const SHOWCIRCLES = 1
@@ -14,6 +14,7 @@ var starsBack = [];
 var starsFarBack = [];
 
 let iLyrics;
+let player;
 let times = new Times()
 
 let sizePoingOscillation = 0
@@ -32,10 +33,10 @@ const cvw = document.body.clientWidth
 const cvh = document.body.clientHeight
 
 let sizeoscillator = 0
-function saveSpeeds(){
+function saveSpeeds() {
   speeds.saved = {
-    start: timeSong,
-    end: timeSong + 2000,
+    start: player.timeSong,
+    end: player.timeSong + 2000,
     vertical: speeds.vertical.speed,
     horizontal: speeds.horizontal.speed,
     radius: speeds.radius.speed,
@@ -208,25 +209,13 @@ var speeds = {
 }
 
 
-function start() {
-  if (music.paused) {
-    if (music.currentTime == 0) {
-      music.currentTime += 0.096
-    }
-    startTime = performance.now() - (timeSong || 0)
-    music.play().then(songStarted = true);
-    music.playbackRate = 1;
-  }
-  else {
-    music.pause()
-    songStarted = false
-  }
-}
+
 
 function init() {
   N = 50
   timePrev = 0
-  music = new Audio('music/hello.mp3');
+  player = new Player('music/hello.mp3')
+  //music = new Audio('music/hello.mp3');
   initCanvas()
   debug = new DebugWindow(ctx)
   initStars()
@@ -239,7 +228,6 @@ function initCanvas() {
   canvas = document.querySelector("canvas");
   canvas.width = cvw;
   canvas.height = cvh;
-  canvas.addEventListener('click', start)
   ctx = canvas.getContext("2d");
 }
 
@@ -318,15 +306,6 @@ function updateStarsFarBack(dt) {
 }
 
 
-
-
-function travelTo(toTime_ms) {
-  const toTime = toTime_ms / 1000
-  music.currentTime = toTime
-  startTime = timeNow - toTime_ms
-  timeSong = toTime_ms
-}
-
 function drawLyrics() {
   ctx.fillStyle = lyrics.color.rgb
   ctx.font = "70px arial";
@@ -337,14 +316,14 @@ function drawLyrics() {
 }
 
 function drawSecondaryLyrics() {
-  if (timeSong >= times.tStartSecondaryLyrics && timeSong <= times.tEndSecondaryLyrics ||
-    timeSong >= times.tStartSecondaryLyrics2 && timeSong <= times.tEndSecondaryLyrics2
+  if (player.timeSong >= times.tStartSecondaryLyrics && player.timeSong <= times.tEndSecondaryLyrics ||
+    player.timeSong >= times.tStartSecondaryLyrics2 && player.timeSong <= times.tEndSecondaryLyrics2
   ) {
     ctx.font = "50px arial";
     ctx.textAlign = "center"
     for (i in secondaryLyrics.content) {
       const lyric = secondaryLyrics.content[i]
-      if (timeSong >= lyric.tStart) {
+      if (player.timeSong >= lyric.tStart) {
         ctx.fillStyle = "rgb(102, 0, 204," + lyric.alpha + ")";
         ctx.fillText(lyric.text, lyric.position.x, lyric.position.y);
       }
@@ -354,7 +333,7 @@ function drawSecondaryLyrics() {
 
 function isAnyOfThisIntervals(intervals) {
   var veredicto = false
-  intervals.forEach(t => { if (timeSong >= t && timeSong <= t + 1500) veredicto = t })
+  intervals.forEach(t => { if (player.timeSong >= t && player.timeSong <= t + 1500) veredicto = t })
   return veredicto
 
 }
@@ -374,9 +353,9 @@ function drawStarsFront(stars) {
     ctx.fillStyle = colors.starsFront.color.rgb;
     var star = stars[i];
 
-    const oscillation = Math.cos(timeSong / 100 + Math.PI)
+    const oscillation = Math.cos(player.timeSong / 100 + Math.PI)
 
-    const constantoscillation = sizeoscillator * Math.cos(timeSong / 100 + i * Math.PI / 2)
+    const constantoscillation = sizeoscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
     const poingOscillation = tremolo.size * oscillation
     const size = sizeFrontMax / star.z + constantoscillation + poingOscillation
 
@@ -404,8 +383,8 @@ function drawStarsBack(stars) {
   for (i in stars) {
     var star = stars[i];
 
-    const oscillation = Math.cos(timeSong / 100 + Math.PI)
-    const constantoscillation = sizeoscillator * Math.cos(timeSong / 100 + i * Math.PI / 2)
+    const oscillation = Math.cos(player.timeSong / 100 + Math.PI)
+    const constantoscillation = sizeoscillator * Math.cos(player.timeSong / 100 + i * Math.PI / 2)
     const poingOscillation = tremolo.size * oscillation
     const size = sizeBackMax / star.z + constantoscillation + poingOscillation
 
@@ -445,17 +424,17 @@ function updateResetAllSpeedsTransition() {
   speeds.keys.oscillatorySpeedX = speedTransition(speeds.saved.oscillatorySpeedX, 0, start, end)
   speeds.keys.oscillatorySpeedY = speedTransition(speeds.saved.oscillatorySpeedY, 0, start, end)
 
-  if (timeSong > end) speeds.reset = false
+  if (player.timeSong > end) speeds.reset = false
 }
 
 function speedTransition(from, to, start, end) {
   const acceleration = (to - from) / (end - start)
-  return from + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+  return from + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
 }
 
 function colorTransition(from, to, start, end) {
   const colorSpeed = to.minus(from).divided(end - start)
-  return from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+  return from.plus(colorSpeed.multiplied(Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
 }
 
 function updateSpeeds() {
@@ -495,16 +474,16 @@ function updateSpeeds() {
 function updateColors() {
 
   // 1st transition (black - white)
-  if (timeSong <= times.tStartChangeColor2) {
+  if (player.timeSong <= times.tStartChangeColor2) {
     colors.background.color = colorTransition(colors.background.from, colors.background.to, times.tStartChangeColor, times.tEndChangeColor)
     colors.starsFront.color = colorTransition(colors.starsFront.from, colors.starsFront.to, times.tStartChangeColor, times.tEndChangeColor)
     colors.starsBack.color = colorTransition(colors.starsBack.from, colors.starsBack.to, times.tStartChangeColor, times.tEndChangeColor)
-  } else if (timeSong <= times.tStartChangeColor3) {
+  } else if (player.timeSong <= times.tStartChangeColor3) {
     // 2n transition (white - blue)
     colors.background.color = colorTransition(colors.background.to, colors.background.to2, times.tStartChangeColor2, times.tEndChangeColor2)
     colors.starsFront.color = colorTransition(colors.starsFront.to, colors.starsFront.to2, times.tStartChangeColor2, times.tEndChangeColor2)
     colors.starsBack.color = colorTransition(colors.starsBack.to, colors.starsBack.to2, times.tStartChangeColor2, times.tEndChangeColor2)
-  } else if (timeSong <= times.tStartChangeColor4) {
+  } else if (player.timeSong <= times.tStartChangeColor4) {
     // 3rd transition (black - white)
     colors.background.color = colorTransition(colors.background.to2, colors.background.to, times.tStartChangeColor3, times.tEndChangeColor3)
     colors.starsFront.color = colorTransition(colors.starsFront.to2, colors.starsFront.to, times.tStartChangeColor3, times.tEndChangeColor3)
@@ -540,9 +519,9 @@ function updateSpeedsKeyPressed() {
 
 function updateShape() {
   let shape = 0
-  if (timeSong >= times.tChangeShape && timeSong <= times.tChangeShape2) {
+  if (player.timeSong >= times.tChangeShape && player.timeSong <= times.tChangeShape2) {
     shape = 1
-  } else if (timeSong >= times.tChangeShape2) {
+  } else if (player.timeSong >= times.tChangeShape2) {
     shape = 0
 
   }
@@ -559,7 +538,7 @@ function triggerNextLyric() {
 function updateLyrics() {
 
 
-  if (lyrics.test && timeSong >= lyrics.t[0]) {
+  if (lyrics.test && player.timeSong >= lyrics.t[0]) {
     lyrics.t.shift()
     triggerNextLyric()
 
@@ -573,22 +552,22 @@ function updateLyrics() {
   lyrics.position.x = canvas.width / 2 + Math.cos(timeNow / 1000) * 20
   lyrics.position.y = canvas.height / 2 + Math.sin(timeNow / 1000) * 10
 
-  if (timeSong >= times.tEndChangeColor) lyrics.Color = new Color
+  if (player.timeSong >= times.tEndChangeColor) lyrics.Color = new Color
 }
 
 function updateSecondaryLyrics() {
-  if (timeSong >= times.tStartSecondaryLyrics && timeSong <= times.tEndSecondaryLyrics ||
-    timeSong >= times.tStartSecondaryLyrics2 && timeSong <= times.tEndSecondaryLyrics2
+  if (player.timeSong >= times.tStartSecondaryLyrics && player.timeSong <= times.tEndSecondaryLyrics ||
+    player.timeSong >= times.tStartSecondaryLyrics2 && player.timeSong <= times.tEndSecondaryLyrics2
   ) {
     for (i in secondaryLyrics.content) {
       const lyric = secondaryLyrics.content[i]
       const start = lyric.tStart
       const end = start + 3000
-      if (timeSong >= start) {
+      if (player.timeSong >= start) {
         // I'm not refactoring this
-        lyric.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+        lyric.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
         const acceleration = (0 - 1) / (end - start)
-        lyric.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+        lyric.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
       }
     }
   }
@@ -597,7 +576,7 @@ function updateSecondaryLyrics() {
 function updateTremoloSize() {
   const maxSizeoscillator = 6
 
-  if (timeSong <= times.tClimaxTremolo)
+  if (player.timeSong <= times.tClimaxTremolo)
     sizeoscillator = speedTransition(0, maxSizeoscillator, times.tStartTremolo, times.tClimaxTremolo)
   else
     sizeoscillator = speedTransition(maxSizeoscillator, 0, times.tClimaxTremolo, times.tEndTremolo)
@@ -606,10 +585,10 @@ function updateTremoloSize() {
   if (shouldTremolo) {
     const start = shouldTremolo
     const end = start + 1600
-    if (timeSong >= start) {
+    if (player.timeSong >= start) {
       // I'm not refactoring this
       const acceleration = (0 - 3) / (end - start)
-      tremolo.size = 3 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      tremolo.size = 3 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
     }
   }
 }
@@ -625,12 +604,12 @@ function updateTernaryLyrics() {
   if (shouldDrawQuieroVolar) {
     const start = shouldDrawQuieroVolar
     const end = start + 1500
-    if (timeSong >= start) {
+    if (player.timeSong >= start) {
       // I'm not refactoring this
-      // ternaryLyrics.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      // ternaryLyrics.position.y = cvh + (-0.2 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
       const acceleration = (0 - 1) / (end - start)
-      ternaryLyrics.position.y = cvh + (-0.05 * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
-      ternaryLyrics.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(timeSong), start), end) - start))
+      ternaryLyrics.position.y = cvh + (-0.05 * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
+      ternaryLyrics.alpha = 1 + (acceleration * (Math.min(Math.max(parseFloat(player.timeSong), start), end) - start))
     }
   }
 }
@@ -641,13 +620,14 @@ function update() {
   timeNow = performance.now()
   dt = timeNow - timePrev
   timePrev = timeNow
-
-  if (songStarted) {
-    timeSong = timeNow - startTime
-
+  
+  player.update(timeNow)
+  
+  if(player._songStarted){
     updateSpeeds()
     updateColors()
   }
+
   // UPDATE LYRICS
   updateLyrics()
   updateSecondaryLyrics()
@@ -662,10 +642,6 @@ function update() {
     updateStarsFarBack(dt)
   updateStarsBack(dt)
   updateStarsFront(dt)
-
-
-
-
 }
 
 //RENDER
