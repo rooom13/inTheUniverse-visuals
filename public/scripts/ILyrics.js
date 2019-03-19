@@ -18,7 +18,7 @@ class InteractiveLyrics {
             'Vente al universo conmigo',
             'Prepárate y vámonos',
             'Vente al universo conmigo',
-            'In the universe I want to fly',
+            'In the universe', 'I want to fly',
             'Far away from civilization',
             'Please come with me',
             'And take my hand',
@@ -30,8 +30,20 @@ class InteractiveLyrics {
             "There won't be walls",
             "There won't be any countries or nations",
             "Just you and me",
-            "In our new world", "In our new world", "In the universe", "I want to fly", "Far away from civilization", "Please come with me", "And take my hand", "Let's abandon this constellation", "In the universe I want to fly", 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 'In the universe I want to fly', "Far away from civilization", "Please come with me", 'And take my hand', "Let's abandon this constellation", 'In the universe I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 'IN', 'THE', 'UNIVERSE', 'I', 'WANT', 'TO', 'FLY', 'FAR', 'AWAY', 'FROM', 'CIVILIZATION', 'PLEASE', 'COME', 'WITH', 'ME', 'AND', 'TAKE', 'MY', 'HAND', "LET'S", 'ABANDON', 'THIS', 'CONSTELLATION', 'Fly', 'In the universe', 'I want to', 'Fly', 'There is no war', 'There is no', 'Crime', 'Please come with me and take my', 'Hand', 'Sal ahora mismo y déjalo', 'Vente al universo conmigo', 'Escápate y olvídalo', 'Vente al universo conmigo', 'Prepárate y vámonos', 'Vente al universo conmigo', 'IN', 'THE', 'UNIVERSE', 'I', 'WANT', 'TO', 'FLY', 'FAR', 'AWAY', 'FROM', 'CIVILIZATION', 'PLEASE', 'COME', 'WITH', 'ME', 'AND', 'TAKE', 'MY', 'HAND', "LET'S", 'ABANDON', 'THIS', 'CONSTELLATION', 'In the universe I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 'In the universe', 'I want to fly', 'Far away from civilization', 'Please come with me ', 'And take my hand',
-            "Let's abandon this constellation"
+            "In our new world", "In our new world", 
+            "In the universe", "I want to fly", "Far away from civilization", "Please come with me", "And take my hand","Let's abandon this constellation", 
+            "In the universe",  "I want to fly", 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 
+            'In the universe',  'I want to fly', "Far away from civilization", "Please come with me", 'And take my hand', "Let's abandon this constellation", 
+            'In the universe',  'I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 
+            'IN', 'THE', 'UNIVERSE', 'I', 'WANT', 'TO', 'FLY', 'FAR', 'AWAY', 'FROM', 'CIVILIZATION', 'PLEASE', 'COME', 'WITH', 'ME', 'AND', 'TAKE', 
+            'MY', 'HAND', "LET'S", 'ABANDON', 'THIS', 'CONSTELLATION', 'Fly', 
+            'In the universe', 'I want to', 'Fly', 'There is no war', 'There is no', 'Crime', 'Please come with me and take my', 
+            'Hand', 'Sal ahora mismo y déjalo', 'Vente al universo conmigo', 'Escápate y olvídalo', 'Vente al universo conmigo', 
+            'Prepárate y vámonos', 'Vente al universo conmigo', 
+            'IN', 'THE', 'UNIVERSE', 'I', 'WANT', 'TO', 'FLY', 'FAR', 'AWAY', 'FROM', 'CIVILIZATION', 'PLEASE', 'COME', 'WITH', 'ME', 'AND', 'TAKE', 
+            'MY', 'HAND', "LET'S", 'ABANDON', 'THIS', 'CONSTELLATION', 
+            'In the universe', 'I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 
+            'In the universe', 'I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation"
         ]
 
 
