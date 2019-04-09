@@ -37,10 +37,10 @@ const onKeyDown = (e) => {
             stars.drawFar = !stars.drawFar
             break;
         case 'KeyM':
-            lyrics.position.noise -= 0.5
+            lyrics.noise -= 0.5
             break;
         case 'KeyN':
-            lyrics.position.noise += 0.5
+            lyrics.noise += 0.5
             break;
         case 'KeyT':
             console.log(player.timeSong)
