@@ -173,7 +173,8 @@ class Values {
             isFadingOut: false,
             color: colors.lyrics0,
             position: { x: 0, y: 0, noise: 5 },
-            t: []
+            t: [],
+            index: 0
         }
 
     }

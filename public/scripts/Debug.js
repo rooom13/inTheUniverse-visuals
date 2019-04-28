@@ -35,6 +35,7 @@ lyrics.noise:
 lyrics.isFadingOut:
 sizeoscilatpor:
 lyrics.test:
+lyrics.index:
 `
         const value =
 `${dt.toFixed(2)}
@@ -51,6 +52,7 @@ ${lyrics.position.noise}
 ${lyrics.isFadingOut}
 ${sizes.oscillator}
 ${lyrics.test}
+${lyrics.index}
 `
         const lines = what.split('\n');
         const lines2 = value.split('\n');

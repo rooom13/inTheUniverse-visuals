@@ -379,6 +379,7 @@ function triggerNextLyric() {
   lyrics.iLyrics.nextWord()
   lyrics.isFadingOut = true
   lyrics.color.alpha = 1
+  lyrics.index++
 }
 
 function updateLyrics() {

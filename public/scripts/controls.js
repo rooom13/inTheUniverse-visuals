@@ -3,7 +3,9 @@ const onKeyDown = (e) => {
     switch (e.code) {
         case 'Digit0':
             player.goTo(0)
-            iLyrics.reset()
+            lyrics.iLyrics.reset()
+            lyrics.index = 0
+
             break;
         case 'Digit1':
             player.goTo(times.tStartChangeColor)
@@ -51,12 +53,6 @@ const onKeyDown = (e) => {
         case 'KeyL':
             lyrics.test = !lyrics.test
             break;
-        case 'KeyQ':
-            sizes.oscillator += 0.5
-            break;
-        case 'KeyA':
-            sizeos.scillator -= 0.5
-            break;
         case 'KeyS':
             player.togglePaused(timeNow)
             break;
@@ -72,6 +68,15 @@ const onKeyDown = (e) => {
         case 'KeyR':
             saveSpeeds()
             speeds.reset = true
+            break
+        case 'KeyA':
+            player._music.playbackRate += 0.1
+            console.log(player._music.playbackRate)
+            
+            break
+            case 'KeyZ':
+            player._music.playbackRate -= 0.1
+            console.log(player._music.playbackRate)
             break
     }
 }
