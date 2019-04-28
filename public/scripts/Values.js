@@ -172,9 +172,9 @@ class Values {
             test: false,
             isFadingOut: false,
             color: colors.lyrics0,
-            position: { x: 0, y: 0, noise: 5 },
-            t: [],
-            index: 0
+            positions: [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }],
+            noise: 5,
+            t: []
         }
 
     }
