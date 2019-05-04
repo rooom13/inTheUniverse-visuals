@@ -54,6 +54,7 @@ function init() {
   debug = new DebugWindow(ctx)
   initStars()
   window.requestAnimationFrame(() => { update(); render() })
+  lyrics.t = times.primaryLyrics
 
   //borrar
   // lyrics.iLyrics.nextWord()
@@ -168,7 +169,7 @@ function drawLyrics() {
 
 
   const d = 0
-  const colors = ['red', 'orange', lyrics.color.rgb]
+  const colors = [lyrics.color3.rgb, lyrics.color2.rgb, lyrics.color.rgb]
 
   for (c in colors) {
     ctx.fillStyle = colors[c]
@@ -400,6 +401,8 @@ function triggerNextLyric() {
   lyrics.iLyrics.nextWord()
   lyrics.isFadingOut = true
   lyrics.color.alpha = 1
+  lyrics.color2.alpha = 1
+  lyrics.color3.alpha = 1
   lyrics.index++
 }
 
@@ -411,7 +414,9 @@ function updateLyrics() {
 
   if (lyrics.isFadingOut) {
     lyrics.color.alpha -= 0.01
-    if (lyrics.color.alpha <= 0) lyrics.isFadingOut = false
+    lyrics.color2.alpha -= 0.009
+    lyrics.color3.alpha -= 0.008  
+    if (lyrics.color3.alpha <= 0) lyrics.isFadingOut = false
   }
   const pos = []
   for(i = 0; i < 3; ++i){

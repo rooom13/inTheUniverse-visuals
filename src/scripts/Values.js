@@ -21,7 +21,9 @@ class Values {
                 to: new Color(35, 35, 35),
                 to2: new Color(251, 231, 173)
             },
-            lyrics0: new Color(255, 255, 0),
+            lyrics00: new Color(255, 255, 0),
+            lyrics01: new Color(255, 152, 0),
+            lyrics02: new Color(255, 0, 0),
             lyric1: new Color(255, 255, 0)
         }
     }
@@ -169,9 +171,11 @@ class Values {
     static primaryLyrics() {
         return {
             iLyrics : new InteractiveLyrics(),
-            test: false,
+            test: true,
             isFadingOut: false,
-            color: colors.lyrics0,
+            color: colors.lyrics00,
+            color2: colors.lyrics01,
+            color3: colors.lyrics02,
             positions: [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }],
             noise: 5,
             t: []

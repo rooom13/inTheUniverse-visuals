@@ -6,7 +6,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 // Set Static File Directory
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/src'));
 
 
 
@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/public'));
  */
 
 app.get('/', function homepage(req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+  res.sendFile(__dirname + '/src/index.html');
 });
 
 /**********

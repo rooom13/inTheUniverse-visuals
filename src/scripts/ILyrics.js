@@ -44,6 +44,7 @@ class InteractiveLyrics {
             'MY', 'HAND', "LET'S", 'ABANDON', 'THIS', 'CONSTELLATION', 
             'In the universe', 'I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation", 
             'In the universe', 'I want to fly', 'Far away from civilization', 'Please come with me', 'And take my hand', "Let's abandon this constellation"
+            ,''
         ]
 
 
