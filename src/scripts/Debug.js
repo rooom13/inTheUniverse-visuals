@@ -1,7 +1,7 @@
 class DebugWindow {
     constructor(c) {
         this.ctx = c
-        this.show = true
+        this.show = false
         this.pairs = []
 
     }

@@ -189,7 +189,7 @@ class Values {
             back: [],
             far: [],
             shape: 0,
-            drawFar: false
+            drawFar: true
         }
     }
 }
