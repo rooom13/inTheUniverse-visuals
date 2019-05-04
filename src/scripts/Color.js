@@ -38,6 +38,9 @@ class Color {
 
 
 
+    rgb_a(alpha) {
+      return `rgb(${this.r}, ${this.g}, ${this.b}, ${alpha})`
+    }
     get rgb() {
       return `rgb(${this.r}, ${this.g}, ${this.b}, ${this.alpha})`
     }

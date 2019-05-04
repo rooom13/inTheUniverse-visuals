@@ -24,7 +24,8 @@ class Values {
             lyrics00: new Color(255, 255, 0),
             lyrics01: new Color(255, 152, 0),
             lyrics02: new Color(255, 0, 0),
-            lyric1: new Color(255, 255, 0)
+            lyric1: new Color(102, 0, 204),
+            lyric2: new Color(0, 255, 0)
         }
     }
 
@@ -89,6 +90,7 @@ class Values {
 
     static secondaryLyrics() {
         return {
+            color: colors.lyric1,
             speed: -3,
             content: [
                 {
@@ -164,7 +166,9 @@ class Values {
             text: 'Quiero volar',
             alpha: 1,
             position: { x: null, y: cvh / 2 },
-            tStart: times.tTernaryLyrics
+            tStart: times.tTernaryLyrics,
+            color: colors.lyric2,
+
         }
     }
 

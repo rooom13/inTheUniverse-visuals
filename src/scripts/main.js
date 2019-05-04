@@ -39,6 +39,7 @@ const lyrics = Values.primaryLyrics()
 const secondaryLyrics = Values.secondaryLyrics()
 const ternaryLyrics = Values.ternaryLyrics()
 
+
 let keyPressedMap = {}
 
 
@@ -191,7 +192,7 @@ function drawSecondaryLyrics() {
     for (i in secondaryLyrics.content) {
       const lyric = secondaryLyrics.content[i]
       if (player.timeSong >= lyric.tStart) {
-        ctx.fillStyle = "rgb(102, 0, 204," + lyric.alpha + ")";
+        ctx.fillStyle = secondaryLyrics.color.rgb_a(lyric.alpha)
         ctx.fillText(lyric.text, lyric.position.x, lyric.position.y);
       }
     }
@@ -209,7 +210,7 @@ function drawTernaryLyrics() {
   if (ternaryLyrics.shouldDraw) {
     ctx.font = "40px arial";
     ctx.textAlign = "center"
-    ctx.fillStyle = "rgb(01, 255, 1," + ternaryLyrics.alpha + ")";
+    ctx.fillStyle = ternaryLyrics.color.rgb_a(ternaryLyrics.alpha);
     ctx.fillText(ternaryLyrics.text, ternaryLyrics.position.x, ternaryLyrics.position.y);
   }
 }
