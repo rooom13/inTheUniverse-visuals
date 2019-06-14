@@ -271,8 +271,11 @@ function drawStarsBack(stars) {
 function drawStarsFarBack(stars) {
   ctx.fillStyle = colors.starsFront.color.rgb
   for (star in stars) {
-    var star = stars[star];
-    ctx.fillRect(star.x, star.y, 0.3, 0.3);
+
+    // ROMAN here bitte
+    const size =0.3
+    star = stars[star];
+    ctx.fillRect(star.x, star.y, size, size);
   }
 }
 
@@ -441,7 +444,7 @@ function updateLyrics() {
         const start = lyric.tStart
         const end = start + 2500
         if (player.timeSong >= start) {
-          lyric.position.y = transition(cvh, cvh - 500, start, end)
+          lyric.position.y = transition(cvh + 20, cvh - 500, start, end)
           lyric.alpha = transition(1, 0, start, end)
         }
       }

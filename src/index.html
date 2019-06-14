@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
 
   <title>In The Universe</title>
 
@@ -34,8 +35,14 @@
     <input id="numbersInput" placeholder="E.g. 1223 3123 3145 1231" />
     <button onclick="lyrics.t = numbersInput.value.split(' ').filter((v,i,a)=>v!=='')">Go</button>
   </div>
-
-  <canvas id="myCanvas"></canvas>
+  <div 
+  style="display:none"
+  >
+    <div style="position: absolute;color: #ff19d4;font-size: 4rem;"> Quiero VOlar</div>
+    <div style="position: absolute; color: #5a0a4b; font-size: 3.95rem"> Quiero VOlar</div>
+    <div style="position: absolute; color: #001863; font-size: 3.9rem"> Quiero VOlar</div>
+  </div>
+    <canvas id="myCanvas"></canvas>
 
   <script src="scripts/Color.js"></script>
 

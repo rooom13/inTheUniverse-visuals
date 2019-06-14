@@ -21,11 +21,14 @@ class Values {
                 to: new Color(35, 35, 35),
                 to2: new Color(251, 231, 173)
             },
-            lyrics00: new Color(255, 255, 0),
-            lyrics01: new Color(255, 152, 0),
-            lyrics02: new Color(255, 0, 0),
-            lyric1: new Color(102, 0, 204),
-            lyric2: new Color(0, 255, 0)
+            // lyrics00: new Color(255, 255, 0),
+            // lyrics01: new Color(255, 152, 0),
+            // lyrics02: new Color(255, 0, 0),
+            lyrics00: new Color(0, 24, 99),
+            lyrics01: new Color(90, 10, 71),
+            lyrics02: new Color(255, 25, 212),
+            lyric1: new Color(52, 0, 54),
+            lyric2: new Color(90, 10, 75)
         }
     }
 
