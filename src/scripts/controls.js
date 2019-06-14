@@ -2,37 +2,37 @@ const onKeyDown = (e) => {
     // console.log(e)
     switch (e.code) {
         case 'Digit0':
-            player.goTo(0)
+            myplayer.goTo(0)
             lyrics.iLyrics.reset()
             lyrics.index = 0
 
             break;
         case 'Digit1':
-            player.goTo(times.tStartChangeColor)
+            myplayer.goTo(times.tStartChangeColor)
             break;
         case 'Digit2':
-            player.goTo(ternaryLyrics.tStart[0] - 500)
+            myplayer.goTo(ternaryLyrics.tStart[0] - 500)
             break;
         case 'Digit3':
-            player.goTo(times.tStartChangeColor2 - 500)
+            myplayer.goTo(times.tStartChangeColor2 - 500)
             break;
         case 'Digit4':
-            player.goTo(times.tPlatillos - 1000)
+            myplayer.goTo(times.tPlatillos - 1000)
             break;
         case 'Digit5':
-            player.goTo(times.tToLeftSpeed - 1000)
+            myplayer.goTo(times.tToLeftSpeed - 1000)
             break;
         case 'Digit6':
-            player.goTo(times.tStartTremolo - 1000)
+            myplayer.goTo(times.tStartTremolo - 1000)
             break;
         case 'Digit7':
-            player.goTo(times.tEndTremolo - 1000)
+            myplayer.goTo(times.tEndTremolo - 1000)
             break;
         case 'Digit8':
-            player.goTo(times.tTornado - 1000)
+            myplayer.goTo(times.tTornado - 1000)
             break;
         case 'Space':
-            numbersInput.value = numbersInput.value + ' ' + player.timeSong.toFixed(0)
+            numbersInput.value = numbersInput.value + ' ' + myplayer.timeSong.toFixed(0)
             triggerNextLyric()
             break;
         case 'KeyB':
@@ -45,7 +45,7 @@ const onKeyDown = (e) => {
             lyrics.noise += 0.5
             break;
         case 'KeyT':
-            console.log(player.timeSong)
+            console.log(myplayer.timeSong)
             break;
         case 'KeyD':
             debug.toggle()
@@ -54,29 +54,29 @@ const onKeyDown = (e) => {
             lyrics.test = !lyrics.test
             break;
         case 'KeyS':
-            player.togglePaused(timeNow)
+            myplayer.togglePaused(timeNow)
             break;
         case 'KeyC':
             starsShape = (starsShape + 1) % 2
             break
         case 'KeyP':
-            player.goTo(player.timeSong + 3000)
+            myplayer.goTo(myplayer.timeSong + 3000)
             break
         case 'KeyO':
-            player.goTo(player.timeSong - 3000)
+            myplayer.goTo(myplayer.timeSong - 3000)
             break
         case 'KeyR':
             saveSpeeds()
             speeds.reset = true
             break
         case 'KeyA':
-            player._music.playbackRate += 0.1
-            console.log(player._music.playbackRate)
+            myplayer._music.playbackRate += 0.1
+            console.log(myplayer._music.playbackRate)
             
             break
             case 'KeyZ':
-            player._music.playbackRate -= 0.1
-            console.log(player._music.playbackRate)
+            myplayer._music.playbackRate -= 0.1
+            console.log(myplayer._music.playbackRate)
             break
     }
 }
