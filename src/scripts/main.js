@@ -57,13 +57,7 @@ function init() {
   window.requestAnimationFrame(() => { update(); render() })
   lyrics.t = times.primaryLyrics
 
-  //borrar
-  // lyrics.iLyrics.nextWord()
-  // lyrics.iLyrics.nextWord()
-  // lyrics.iLyrics.nextWord()
-  // lyrics.iLyrics.nextWord()
-
-
+  
 }
 
 // INITATORS
@@ -331,8 +325,10 @@ function updateVerticalSpeed() {
 }
 
 function updateOscillatorySpeeds() {
-  speeds.angular.speed = speeds.keys.angular + transition(speeds.angular.from, speeds.angular.to, times.tEndTremolo, times.tEndTremolo + 10000)
-  speeds.radius.speed = speeds.keys.radius + transition(speeds.radius.from, speeds.radius.to, times.tEndTremolo, times.tEndTremolo + 20000)
+  speeds.angular.speed = speeds.keys.angular + transition(speeds.angular.from, speeds.angular.to, times.tEndTremolo , times.tEndTremolo + 10000)
+  speeds.radius.speed = speeds.keys.radius + transition(speeds.radius.from, speeds.radius.to, times.tEndTremolo , times.tEndTremolo + 40000)
+  // speeds.angular.speed = speeds.keys.angular + transition(speeds.angular.from, 0, times.tEndTremolo, times.tEndTremolo + 10000)
+  // speeds.radius.speed = speeds.keys.radius + transition(speeds.radius.from, 0, times.tEndTremolo, times.tEndTremolo + 20000)
 
   speeds.oscillatorySpeedX.speed = speeds.keys.oscillatorySpeedX
   speeds.oscillatorySpeedY.speed = speeds.keys.oscillatorySpeedX
@@ -536,18 +532,18 @@ isRecording = false
 var capturer = new CCapture({ format: 'webm' });
 
 
-document.addEventListener('mousedown', () => {
-  if (!isRecording) {
-    capturer.start()
-    console.log('Recording')
-  }
-  else {
-    console.log('Saving...')
-    capturer.stop()
-    capturer.save()
-    console.log('Saved')
-  }
-  isRecording = !isRecording
-})
+// document.addEventListener('mousedown', () => {
+//   if (!isRecording) {
+//     capturer.start()
+//     console.log('Recording')
+//   }
+//   else {
+//     console.log('Saving...')
+//     capturer.stop()
+//     capturer.save()
+//     console.log('Saved')
+//   }
+//   isRecording = !isRecording
+// })
 
 init()

@@ -40,7 +40,7 @@ lyrics.index:
         const value =
 `${dt.toFixed(2)}
 ${JSON.stringify(keyPressedMap)}
-${(player.timeSong / 1000 || 0).toFixed(2)}
+${(myplayer.timeSong / 1000 || 0).toFixed(2)}
 ${timeNow.toFixed(0)}
 ${speeds.horizontal.speed.toFixed(2)}
 ${speeds.vertical.speed.toFixed(2)}
