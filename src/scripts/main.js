@@ -267,7 +267,7 @@ function drawStarsFarBack(stars) {
   for (star in stars) {
 
     // ROMAN here bitte
-    const size = 0.3
+    const size = 0.8
     star = stars[star];
     ctx.fillRect(star.x, star.y, size, size);
   }
