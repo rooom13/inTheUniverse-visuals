@@ -523,27 +523,13 @@ function render() {
   drawSecondaryLyrics()
   drawTernaryLyrics()
   debug.render()
-  capturer.capture(canvas);
   window.requestAnimationFrame(() => { update(); render() });
 }
 
 
 isRecording = false
-var capturer = new CCapture({ format: 'webm' });
 
 
-// document.addEventListener('mousedown', () => {
-//   if (!isRecording) {
-//     capturer.start()
-//     console.log('Recording')
-//   }
-//   else {
-//     console.log('Saving...')
-//     capturer.stop()
-//     capturer.save()
-//     console.log('Saved')
-//   }
-//   isRecording = !isRecording
-// })
+
 
 init()

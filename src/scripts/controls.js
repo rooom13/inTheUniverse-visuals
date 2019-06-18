@@ -72,14 +72,16 @@ const onKeyDown = (e) => {
         case 'KeyA':
             myplayer._music.playbackRate += 0.1
             console.log(myplayer._music.playbackRate)
-            
+
             break
-            case 'KeyZ':
+        case 'KeyZ':
             myplayer._music.playbackRate -= 0.1
             console.log(myplayer._music.playbackRate)
             break
     }
 }
+
+document.addEventListener('mousedown', () => myplayer.togglePaused(timeNow))
 document.addEventListener("keydown", onKeyDown);
 onkeydown = onkeyup = function (e) {
     e = e || event; // to deal with IE
